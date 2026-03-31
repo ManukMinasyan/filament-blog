@@ -16,7 +16,15 @@ return new class extends Migration
             $table->text('excerpt')->nullable();
             $table->string('featured_image')->nullable();
             $table->foreignId('category_id')->nullable()->constrained('blog_categories')->nullOnDelete();
-            $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
+
+            $userIdColumn = Schema::getColumns('users')[0];
+            if (str_contains($userIdColumn['type'], 'char')) {
+                $table->char('author_id', 26);
+            } else {
+                $table->unsignedBigInteger('author_id');
+            }
+            $table->foreign('author_id')->references('id')->on('users')->cascadeOnDelete();
+
             $table->string('status')->default('draft');
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
