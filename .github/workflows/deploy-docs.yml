@@ -8,6 +8,10 @@ on:
       - '.github/workflows/deploy-docs.yml'
   workflow_dispatch:
 
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
@@ -15,17 +19,40 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
+      - name: Checkout source branch
         uses: actions/checkout@v6
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v6
+        with:
+          ref: gh-pages
+          path: gh-pages
+        continue-on-error: true
+
+      - name: Init gh-pages if missing
+        run: |
+          if [ ! -d "gh-pages/.git" ]; then
+            mkdir -p gh-pages
+            cd gh-pages
+            git init
+            git checkout -b gh-pages
+            touch .nojekyll
+            git add .
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git commit -m "Init gh-pages"
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'docs/package-lock.json'
 
       - name: Install dependencies
         working-directory: ./docs
-        run: npm install
+        run: npm ci
 
       - name: Build documentation
         working-directory: ./docs
@@ -34,9 +61,23 @@ jobs:
           NUXT_APP_BASE_URL: /filament-blog/
           NUXT_SITE_URL: https://manukminasyan.github.io
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/.output/public
-          cname: ''
+      - name: Deploy to gh-pages
+        run: |
+          cd gh-pages
+          # Remove everything except .git and .nojekyll
+          find . -maxdepth 1 ! -name '.git' ! -name '.nojekyll' ! -name '.' -exec rm -rf {} +
+          cp -r ../docs/.output/public/* .
+          touch .nojekyll
+
+      - name: Commit and push
+        working-directory: ./gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to deploy"
+          else
+            git commit -m "Deploy docs"
+            git push origin gh-pages --force
+          fi

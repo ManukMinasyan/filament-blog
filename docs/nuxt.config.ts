@@ -14,9 +14,6 @@ export default defineNuxtConfig({
                 logo: false,
             },
         },
-        github: {
-            branch: 'main',
-        },
     },
     app: {
         baseURL,
