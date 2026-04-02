@@ -1,6 +1,21 @@
-# manukminasyan/filament-blog
+# Filament Blog
 
-Headless blog package for Filament applications. Provides models, Filament admin, MCP tools, SEO components, and publishable UI components -- no routes or controllers included.
+Headless blog package for Filament applications. Provides models, Filament admin, MCP tools, SEO components, and publishable UI components — no routes or controllers included.
+
+## Features
+
+- **Filament Admin** — Full PostResource and CategoryResource with markdown editor, draft/published toggle, SEO fields, and featured images
+- **SEO Components** — Meta tags, Open Graph, Twitter Cards, JSON-LD structured data, RSS feed, canonical URLs
+- **13 MCP Tools** — Full CRUD for posts and categories via Model Context Protocol
+- **Publishable UI Components** — Post card, header, body, related posts, category badge, preview banner — all with dark mode
+- **No Routes** — Define your own routes, controllers, and page layouts
+- **Sitemap Generator** — Route-aware sitemap integration via spatie/laravel-sitemap
+
+## Requirements
+
+- PHP 8.4+
+- Laravel 12+
+- Filament 5.x
 
 ## Installation
 
@@ -8,107 +23,45 @@ Headless blog package for Filament applications. Provides models, Filament admin
 composer require manukminasyan/filament-blog
 ```
 
-Register the Filament plugin in your panel provider:
+Register the plugin and run migrations:
 
 ```php
+// AppPanelProvider.php
 ->plugin(\ManukMinasyan\FilamentBlog\FilamentBlogPlugin::make())
 ```
-
-Run migrations:
 
 ```bash
 php artisan migrate
 ```
 
-Publish config:
+## Documentation
 
-```bash
-php artisan vendor:publish --tag=filament-blog-config
-```
+**[Read the full documentation →](https://manukminasyan.github.io/filament-blog/)**
 
-## Configuration
+- [Installation](https://manukminasyan.github.io/filament-blog/getting-started/installation)
+- [Frontend Setup](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup)
+- [Blade Components](https://manukminasyan.github.io/filament-blog/essentials/blade-components)
+- [Filament Admin](https://manukminasyan.github.io/filament-blog/essentials/filament-admin)
+- [MCP Tools](https://manukminasyan.github.io/filament-blog/essentials/mcp-tools)
+- [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration)
 
-```php
-// config/filament-blog.php
-return [
-    'prefix' => 'blog',
-    'author_model' => \App\Models\User::class,
-    'per_page' => 12,
-    'feed' => [
-        'enabled' => true,
-        'title' => 'My Blog',
-        'description' => 'Latest posts.',
-        'author_email' => 'hello@example.com',
-    ],
-    'publisher' => [
-        'name' => 'My Company',
-        'url' => 'https://example.com',
-        'logo' => 'images/logo.png',
-    ],
-];
-```
-
-## Frontend
-
-This package does not register routes. Define your own routes, controllers, and page views. Use the provided Blade components:
-
-### SEO Components
+## Quick Example
 
 ```blade
-{{-- In <head> --}}
-<x-blog::meta-tags :post="$post" />
-<x-blog::feed-link />
+{{-- In your blog show page --}}
+<x-your-layout>
+    @push('head')
+        <x-blog::meta-tags :post="$post" />
+        <x-blog::feed-link />
+    @endpush
 
-{{-- In <body> --}}
-<x-blog::structured-data :post="$post" />
+    <x-blog::structured-data :post="$post" />
+    <x-blog::post-header :post="$post" />
+    <x-blog::post-body :post="$post" />
+    <x-blog::related-posts :posts="$relatedPosts" />
+</x-your-layout>
 ```
 
-### UI Components
+## License
 
-```blade
-<x-blog::post-header :post="$post" />
-<x-blog::post-body :post="$post" />
-<x-blog::post-card :post="$post" />
-<x-blog::related-posts :posts="$relatedPosts" />
-<x-blog::category-badge :category="$category" />
-<x-blog::preview-banner :post="$post" :editUrl="$editUrl" />
-```
-
-### RSS Feed
-
-```blade
-{{-- In your feed route view --}}
-<x-blog::feed :posts="$posts" />
-```
-
-Publish and customize views:
-
-```bash
-php artisan vendor:publish --tag=filament-blog-views
-```
-
-## Expected Route Names
-
-The package checks for these route names when generating URLs:
-
-- `blog.index` - Blog listing page
-- `blog.show` - Single post page (parameter: `slug`)
-- `blog.category` - Category page (parameter: `slug`)
-- `blog.preview` - Draft preview (signed URL, parameter: `post`)
-- `blog.feed` - RSS feed
-
-If routes don't exist, the package gracefully falls back (returns `#` for URLs, skips sitemap entries).
-
-## MCP Tools
-
-The package includes 13 MCP tools for AI agent integration. Register them in your MCP server.
-
-## Sitemap
-
-Add blog URLs to your sitemap:
-
-```php
-use ManukMinasyan\FilamentBlog\BlogSitemapGenerator;
-
-BlogSitemapGenerator::addToSitemap($sitemap);
-```
+MIT
