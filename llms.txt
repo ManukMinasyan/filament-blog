@@ -1,0 +1,20 @@
+# Filament Blog
+
+## Documentation Sets
+
+- [Filament Blog](https://manukminasyan.github.io/filament-blog/llms-full.txt)
+
+## Landing
+
+- [Filament Blog - Headless Blog Package](https://manukminasyan.github.io/filament-blog): Headless blog package for Filament with SEO components, MCP tools, and publishable UI components. No routes included.
+
+## Docs
+
+- [Installation](https://manukminasyan.github.io/filament-blog/getting-started/installation): Install Filament Blog in your Laravel application.
+- [Frontend Setup](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup): Build your own blog frontend using the package's components.
+- [Blade Components](https://manukminasyan.github.io/filament-blog/essentials/blade-components): All available Blade components for building your blog frontend.
+- [Filament Admin](https://manukminasyan.github.io/filament-blog/essentials/filament-admin): Managing blog posts and categories in the Filament admin panel.
+- [MCP Tools](https://manukminasyan.github.io/filament-blog/essentials/mcp-tools): 13 MCP tools for AI agent blog management.
+- [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration): Full configuration reference for Filament Blog.
+- [Contributing](https://manukminasyan.github.io/filament-blog/community/contributing): How to contribute to Filament Blog.
+- [License](https://manukminasyan.github.io/filament-blog/community/license): License information.

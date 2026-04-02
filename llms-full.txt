@@ -1,0 +1,628 @@
+# Filament Blog - Headless Blog Package
+
+::u-page-hero
+#title
+Filament Blog
+
+#description
+Headless blog package for Filament applications with SEO components, MCP tools, and publishable UI components.
+
+No routes or controllers — you own the frontend.
+
+#links
+  :::u-button
+  ---
+  color: neutral
+  size: xl
+  to: https://manukminasyan.github.io/filament-blog/getting-started/installation
+  trailing-icon: i-lucide-arrow-right
+  ---
+  Get started
+  :::
+
+  :::u-button
+  ---
+  color: neutral
+  icon: simple-icons:github
+  size: xl
+  to: https://github.com/ManukMinasyan/filament-blog
+  variant: outline
+  ---
+  GitHub
+  :::
+::
+
+::u-page-section
+#title
+Why Filament Blog?
+
+#features
+  :::u-page-feature
+  ---
+  icon: i-lucide-layout-dashboard
+  ---
+  #title
+  Filament Admin Panel
+  
+  #description
+  Full-featured PostResource and CategoryResource with markdown editor, draft/published toggle, SEO fields, and featured images.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-search
+  ---
+  #title
+  SEO Components
+  
+  #description
+  Ready-to-use Blade components for meta tags, Open Graph, Twitter Cards, JSON-LD structured data, RSS feed, and canonical URLs.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-bot
+  ---
+  #title
+  13 MCP Tools
+  
+  #description
+  Full CRUD for posts and categories via Model Context Protocol. Let AI agents create, edit, and publish blog posts.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-paintbrush
+  ---
+  #title
+  Publishable UI Components
+  
+  #description
+  Default post-card, post-header, post-body, and related-posts components with dark mode. Publish and fully customize for your design.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-route-off
+  ---
+  #title
+  No Routes Included
+  
+  #description
+  Define your own routes, controllers, and page layouts. The package provides the building blocks — you own the frontend.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-map
+  ---
+  #title
+  Sitemap Generator
+  
+  #description
+  Route-aware sitemap generator that automatically adds blog index, categories, and individual posts to your sitemap.
+  :::
+::
+
+
+# Installation
+
+## Requirements
+
+- **PHP:** 8.4+
+- **Laravel:** 12+
+- **Filament:** 5.x
+- **Database:** PostgreSQL, MySQL, SQLite
+
+## Quick Setup
+
+::steps
+### Install Package
+
+```bash [Terminal]
+composer require manukminasyan/filament-blog
+```
+
+  :::alert{type="info"}
+  For private repositories, add the VCS repository to your `composer.json` first:
+  
+  ```json [composer.json]
+  "repositories": [
+      {"type": "vcs", "url": "git@github.com:ManukMinasyan/filament-blog.git"}
+  ]
+  ```
+  :::
+
+### Run Migrations
+
+```bash [Terminal]
+php artisan migrate
+```
+
+This creates `blog_posts` and `blog_categories` tables.
+
+### Register Filament Plugin
+
+```php [AppPanelProvider.php]
+use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+
+$panel->plugins([
+    FilamentBlogPlugin::make(),
+]);
+```
+
+### Publish Config
+
+```bash [Terminal]
+php artisan vendor:publish --tag=filament-blog-config
+```
+
+### Configure
+
+```php [config/filament-blog.php]
+return [
+    'prefix' => 'blog',
+    'author_model' => \App\Models\User::class,
+    'per_page' => 12,
+    'feed' => [
+        'enabled' => true,
+        'title' => 'My Engineering Blog',
+        'description' => 'Latest posts from the team.',
+        'author_email' => 'hello@example.com',
+    ],
+    'publisher' => [
+        'name' => 'My Company',
+        'url' => 'https://example.com',
+        'logo' => 'images/logo.png',
+    ],
+];
+```
+::
+
+**Done!** Visit your Filament panel to see the Blog section with Posts and Categories.
+
+## Morph Map
+
+If your application enforces morph maps, add the blog models:
+
+```php [AppServiceProvider.php]
+Relation::enforceMorphMap([
+    // ...existing entries
+    'blog_post' => \ManukMinasyan\FilamentBlog\Models\Post::class,
+    'blog_category' => \ManukMinasyan\FilamentBlog\Models\Category::class,
+]);
+```
+
+## SEO Migration
+
+The package requires `ralphjsmit/laravel-seo`. Publish its migration:
+
+```bash [Terminal]
+php artisan vendor:publish --tag=seo-migrations
+php artisan migrate
+```
+
+
+# Frontend Setup
+
+This package does not include routes or controllers. You create your own and use the provided Blade components.
+
+## Create Routes
+
+```php [routes/web.php]
+use App\Http\Controllers\BlogController;
+
+Route::prefix('blog')->name('blog.')->group(function () {
+    Route::get('/', [BlogController::class, 'index'])->name('index');
+    Route::get('/feed', [BlogController::class, 'feed'])->name('feed');
+    Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
+    Route::get('/preview/{post}', [BlogController::class, 'preview'])
+        ->name('preview')->middleware('signed');
+    Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
+});
+```
+
+## Create Controller
+
+```php [app/Http/Controllers/BlogController.php]
+use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Category;
+
+final readonly class BlogController
+{
+    public function index(): View
+    {
+        $posts = Post::query()
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->latest('published_at')
+            ->paginate(config('filament-blog.per_page', 12));
+
+        return view('blog.index', compact('posts'));
+    }
+
+    public function show(string $slug): View
+    {
+        $post = Post::query()
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $relatedPosts = Post::query()
+            ->published()
+            ->where('id', '!=', $post->id)
+            ->where('category_id', $post->getAttribute('category_id'))
+            ->with(['category'])
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
+
+        return view('blog.show', compact('post', 'relatedPosts'));
+    }
+
+    public function feed(): Response
+    {
+        $posts = Post::query()
+            ->published()
+            ->with(['category', 'author'])
+            ->latest('published_at')
+            ->limit(20)
+            ->get();
+
+        return response()
+            ->view('blog.feed', compact('posts'))
+            ->header('Content-Type', 'application/rss+xml');
+    }
+}
+```
+
+## Create Views
+
+Use the package's Blade components in your own page layouts:
+
+```blade [resources/views/blog/show.blade.php]
+<x-your-layout>
+    {{-- SEO (in <head>) --}}
+    @push('head')
+        <x-blog::meta-tags :post="$post" />
+        <x-blog::feed-link />
+    @endpush
+
+    {{-- Structured data --}}
+    <x-blog::structured-data :post="$post" />
+
+    {{-- Content --}}
+    <x-blog::post-header :post="$post" />
+    <x-blog::post-body :post="$post" />
+    <x-blog::related-posts :posts="$relatedPosts" />
+</x-your-layout>
+```
+
+```blade [resources/views/blog/index.blade.php]
+<x-your-layout>
+    @foreach($posts as $post)
+        <x-blog::post-card :post="$post" />
+    @endforeach
+
+    {{ $posts->links() }}
+</x-your-layout>
+```
+
+```blade [resources/views/blog/feed.blade.php]
+<x-blog::feed :posts="$posts" />
+```
+
+## Expected Route Names
+
+The package checks for these route names when generating URLs. If a route doesn't exist, it falls back to `#`:
+
+| Route Name      | Purpose                                   |
+| --------------- | ----------------------------------------- |
+| `blog.index`    | Blog listing page                         |
+| `blog.show`     | Single post (param: `slug`)               |
+| `blog.category` | Category page (param: `slug`)             |
+| `blog.preview`  | Draft preview (signed URL, param: `post`) |
+| `blog.feed`     | RSS feed                                  |
+
+
+# Blade Components
+
+All components are publishable. Run `php artisan vendor:publish --tag=filament-blog-views` to customize.
+
+## SEO Components
+
+### Meta Tags
+
+Renders Open Graph, Twitter Card, and article meta tags in `<head>`.
+
+```blade
+@push('head')
+    <x-blog::meta-tags :post="$post" />
+@endpush
+```
+
+**Renders:** `og:title`, `og:description`, `og:type`, `og:image`, `article:published_time`, `article:author`, `article:section`, `twitter:card`, `twitter:title`, `twitter:image`, `canonical`
+
+### Structured Data
+
+Renders JSON-LD `BlogPosting` schema with publisher and breadcrumb data.
+
+```blade
+<x-blog::structured-data :post="$post" />
+```
+
+**Renders:** `@type: BlogPosting` with headline, description, datePublished, dateModified, author, publisher (from config), articleSection, articleBody, and image.
+
+### Feed Link
+
+Renders RSS `<link>` tag in `<head>`. Only renders if `blog.feed` route exists and feed is enabled in config.
+
+```blade
+@push('head')
+    <x-blog::feed-link />
+@endpush
+```
+
+### Feed
+
+Renders full RSS 2.0 XML. Use in your feed route view:
+
+```blade
+{{-- resources/views/blog/feed.blade.php --}}
+<x-blog::feed :posts="$posts" />
+```
+
+## UI Components
+
+### Post Card
+
+Displays a post in a listing. Shows category badge, date, title, excerpt, and featured image thumbnail.
+
+```blade
+<x-blog::post-card :post="$post" />
+```
+
+### Post Header
+
+Renders category badge, title, author name, published date, and estimated read time.
+
+```blade
+<x-blog::post-header :post="$post" />
+```
+
+### Post Body
+
+Renders featured image and markdown content in a Tailwind prose container with dark mode support.
+
+```blade
+<x-blog::post-body :post="$post" />
+```
+
+### Related Posts
+
+Shows related posts section. Only renders if the collection is not empty.
+
+```blade
+<x-blog::related-posts :posts="$relatedPosts" />
+```
+
+### Category Badge
+
+Displays a category pill. Links to category page if `blog.category` route exists.
+
+```blade
+<x-blog::category-badge :category="$post->category" />
+<x-blog::category-badge :category="$post->category" :linked="false" />
+```
+
+### Preview Banner
+
+Sticky amber banner for draft previews. Pushes `noindex` meta tag.
+
+```blade
+<x-blog::preview-banner :post="$post" :editUrl="$editUrl" />
+```
+
+
+# Filament Admin
+
+## Posts Resource
+
+The PostResource provides a full CRUD interface for blog posts.
+
+### Form Fields
+
+| Field          | Type           | Notes                             |
+| -------------- | -------------- | --------------------------------- |
+| Title          | TextInput      | Required, max 255                 |
+| Slug           | TextInput      | Auto-generated, unique            |
+| Content        | MarkdownEditor | Required, full toolbar            |
+| Excerpt        | Textarea       | 3 rows                            |
+| Status         | Toggle         | Published/Draft                   |
+| Published At   | DateTimePicker | Schedule future posts             |
+| Category       | Select         | Searchable, create inline         |
+| Author         | Select         | Defaults to current user          |
+| Featured Image | FileUpload     | Image, public disk                |
+| SEO            | SEO Component  | Title + description (collapsible) |
+
+### List Tabs
+
+Posts are organized into tabs:
+
+| Tab           | Filter                                         |
+| ------------- | ---------------------------------------------- |
+| **Drafts**    | `status = draft`                               |
+| **Scheduled** | `status = published` AND `published_at > now`  |
+| **Published** | `status = published` AND `published_at <= now` |
+
+### Actions
+
+- **View** — Opens post URL (published) or signed preview URL (draft)
+- **Edit** — Edit post form
+- **Delete / Force Delete / Restore** — Soft delete support
+
+## Categories Resource
+
+Simple CRUD for blog categories with name, slug, and post count.
+
+## Plugin Registration
+
+```php [AppPanelProvider.php]
+use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+
+$panel->plugins([
+    FilamentBlogPlugin::make(),
+]);
+```
+
+The plugin auto-discovers PostResource and CategoryResource under the "Blog" navigation group.
+
+
+# MCP Tools
+
+The package includes 13 Model Context Protocol tools for full blog management via AI agents.
+
+## Post Tools
+
+| Tool                     | Type       | Ability        | Description                                                    |
+| ------------------------ | ---------- | -------------- | -------------------------------------------------------------- |
+| `ListPostsTool`          | Read-only  | `posts:read`   | List posts with filters (status, category, search, pagination) |
+| `GetPostTool`            | Read-only  | `posts:read`   | Get post by ID or slug                                         |
+| `CreatePostTool`         | Write      | `posts:create` | Create post (markdown content, auto-slug, auto-sanitize)       |
+| `UpdatePostTool`         | Idempotent | `posts:update` | Update post fields (partial updates)                           |
+| `DeletePostTool`         | Write      | `posts:delete` | Soft delete a post                                             |
+| `RestorePostTool`        | Write      | `posts:delete` | Restore a soft-deleted post                                    |
+| `GeneratePreviewUrlTool` | Read-only  | `posts:read`   | Generate 1-hour signed preview URL                             |
+
+## Category Tools
+
+| Tool                  | Type       | Ability             | Description                     |
+| --------------------- | ---------- | ------------------- | ------------------------------- |
+| `ListCategoriesTool`  | Read-only  | `categories:read`   | List categories with post count |
+| `GetCategoryTool`     | Read-only  | `categories:read`   | Get category by ID or slug      |
+| `CreateCategoryTool`  | Write      | `categories:create` | Create category (auto-slug)     |
+| `UpdateCategoryTool`  | Idempotent | `categories:update` | Update category name            |
+| `DeleteCategoryTool`  | Write      | `categories:delete` | Soft delete a category          |
+| `RestoreCategoryTool` | Write      | `categories:delete` | Restore a soft-deleted category |
+
+## Registration
+
+Register the tools in your MCP server:
+
+```php [app/Mcp/Servers/BlogServer.php]
+use ManukMinasyan\FilamentBlog\Mcp\Tools;
+
+class BlogServer extends Server
+{
+    protected $tools = [
+        Tools\ListPostsTool::class,
+        Tools\GetPostTool::class,
+        Tools\CreatePostTool::class,
+        Tools\UpdatePostTool::class,
+        Tools\DeletePostTool::class,
+        Tools\RestorePostTool::class,
+        Tools\GeneratePreviewUrlTool::class,
+        Tools\ListCategoriesTool::class,
+        Tools\GetCategoryTool::class,
+        Tools\CreateCategoryTool::class,
+        Tools\UpdateCategoryTool::class,
+        Tools\DeleteCategoryTool::class,
+        Tools\RestoreCategoryTool::class,
+    ];
+}
+```
+
+All tools require admin authentication and specific token abilities.
+
+
+# Configuration
+
+Publish the config file:
+
+```bash [Terminal]
+php artisan vendor:publish --tag=filament-blog-config
+```
+
+## Full Reference
+
+```php [config/filament-blog.php]
+return [
+    // Route prefix for blog URLs
+    'prefix' => 'blog',
+
+    // Model class for blog post authors
+    'author_model' => \App\Models\User::class,
+
+    // Posts per page in listings
+    'per_page' => 12,
+
+    // RSS feed configuration
+    'feed' => [
+        'enabled' => true,
+        'title' => null,        // Falls back to app.name + " Blog"
+        'description' => null,
+        'author_email' => null,  // Used in RSS <author> tags
+    ],
+
+    // Publisher info for JSON-LD structured data
+    'publisher' => [
+        'name' => null,    // Organization name
+        'url' => null,     // Organization URL
+        'logo' => null,    // Path to logo (used with asset())
+    ],
+];
+```
+
+## Sitemap Integration
+
+Add blog URLs to your sitemap generation:
+
+```php [GenerateSitemapCommand.php]
+use ManukMinasyan\FilamentBlog\BlogSitemapGenerator;
+use Spatie\Sitemap\Sitemap;
+
+$sitemap = Sitemap::create();
+BlogSitemapGenerator::addToSitemap($sitemap);
+$sitemap->writeToFile(public_path('sitemap.xml'));
+```
+
+The generator is route-aware — it only adds URLs for routes that exist in your application.
+
+## Customizing Views
+
+Publish all Blade component views:
+
+```bash [Terminal]
+php artisan vendor:publish --tag=filament-blog-views
+```
+
+Published views go to `resources/views/vendor/blog/components/`. Edit them to match your design system.
+
+
+# Contributing
+
+Contributions are welcome! Here's how to get started:
+
+1. Fork the repository
+2. Create a feature branch (`feat/my-feature`)
+3. Make your changes
+4. Run tests and static analysis
+5. Submit a pull request
+
+## Development Setup
+
+```bash [Terminal]
+git clone git@github.com:ManukMinasyan/filament-blog.git
+cd filament-blog
+composer install
+```
+
+## Code Style
+
+Follow PSR-12 and Laravel conventions. All files must have `declare(strict_types=1)`.
+
+
+# License
+
+Filament Blog is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT){rel="nofollow"}.

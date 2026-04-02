@@ -1,0 +1,203 @@
+# Frontend Setup
+
+> Build your own blog frontend using the package's components.
+
+This package does not include routes or controllers. You create your own and use the provided Blade components.
+
+## Create Routes
+
+```php [routes/web.php]
+use App\Http\Controllers\BlogController;
+
+Route::prefix('blog')->name('blog.')->group(function () {
+    Route::get('/', [BlogController::class, 'index'])->name('index');
+    Route::get('/feed', [BlogController::class, 'feed'])->name('feed');
+    Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
+    Route::get('/preview/{post}', [BlogController::class, 'preview'])
+        ->name('preview')->middleware('signed');
+    Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
+});
+```
+
+## Create Controller
+
+```php [app/Http/Controllers/BlogController.php]
+use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Category;
+
+final readonly class BlogController
+{
+    public function index(): View
+    {
+        $posts = Post::query()
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->latest('published_at')
+            ->paginate(config('filament-blog.per_page', 12));
+
+        return view('blog.index', compact('posts'));
+    }
+
+    public function show(string $slug): View
+    {
+        $post = Post::query()
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->where('slug', $slug)
+            ->firstOrFail();
+
+        $relatedPosts = Post::query()
+            ->published()
+            ->where('id', '!=', $post->id)
+            ->where('category_id', $post->getAttribute('category_id'))
+            ->with(['category'])
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
+
+        return view('blog.show', compact('post', 'relatedPosts'));
+    }
+
+    public function feed(): Response
+    {
+        $posts = Post::query()
+            ->published()
+            ->with(['category', 'author'])
+            ->latest('published_at')
+            ->limit(20)
+            ->get();
+
+        return response()
+            ->view('blog.feed', compact('posts'))
+            ->header('Content-Type', 'application/rss+xml');
+    }
+}
+```
+
+## Create Views
+
+Use the package's Blade components in your own page layouts:
+
+```blade [resources/views/blog/show.blade.php]
+<x-your-layout>
+    {{-- SEO (in <head>) --}}
+    @push('head')
+        <x-blog::meta-tags :post="$post" />
+        <x-blog::feed-link />
+    @endpush
+
+    {{-- Structured data --}}
+    <x-blog::structured-data :post="$post" />
+
+    {{-- Content --}}
+    <x-blog::post-header :post="$post" />
+    <x-blog::post-body :post="$post" />
+    <x-blog::related-posts :posts="$relatedPosts" />
+</x-your-layout>
+```
+
+```blade [resources/views/blog/index.blade.php]
+<x-your-layout>
+    @foreach($posts as $post)
+        <x-blog::post-card :post="$post" />
+    @endforeach
+
+    {{ $posts->links() }}
+</x-your-layout>
+```
+
+```blade [resources/views/blog/feed.blade.php]
+<x-blog::feed :posts="$posts" />
+```
+
+## Expected Route Names
+
+The package checks for these route names when generating URLs. If a route doesn't exist, it falls back to `#`:
+
+<table>
+<thead>
+  <tr>
+    <th>
+      Route Name
+    </th>
+    
+    <th>
+      Purpose
+    </th>
+  </tr>
+</thead>
+
+<tbody>
+  <tr>
+    <td>
+      <code>
+        blog.index
+      </code>
+    </td>
+    
+    <td>
+      Blog listing page
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <code>
+        blog.show
+      </code>
+    </td>
+    
+    <td>
+      Single post (param: <code>
+        slug
+      </code>
+      
+      )
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <code>
+        blog.category
+      </code>
+    </td>
+    
+    <td>
+      Category page (param: <code>
+        slug
+      </code>
+      
+      )
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <code>
+        blog.preview
+      </code>
+    </td>
+    
+    <td>
+      Draft preview (signed URL, param: <code>
+        post
+      </code>
+      
+      )
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <code>
+        blog.feed
+      </code>
+    </td>
+    
+    <td>
+      RSS feed
+    </td>
+  </tr>
+</tbody>
+</table>

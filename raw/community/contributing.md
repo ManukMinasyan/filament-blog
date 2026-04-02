@@ -1,0 +1,23 @@
+# Contributing
+
+> How to contribute to Filament Blog.
+
+Contributions are welcome! Here's how to get started:
+
+1. Fork the repository
+2. Create a feature branch (`feat/my-feature`)
+3. Make your changes
+4. Run tests and static analysis
+5. Submit a pull request
+
+## Development Setup
+
+```bash [Terminal]
+git clone git@github.com:ManukMinasyan/filament-blog.git
+cd filament-blog
+composer install
+```
+
+## Code Style
+
+Follow PSR-12 and Laravel conventions. All files must have `declare(strict_types=1)`.
