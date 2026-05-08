@@ -5,9 +5,7 @@
 Filament Blog
 
 #description
-Headless blog package for Filament applications with SEO components, MCP tools, and publishable UI components.
-
-No routes or controllers — you own the frontend.
+Headless-by-default blog for Filament 5 — opt into public routes, RSS feed, tags taxonomy, and MediaLibrary integration with config flags. Your app stays in control.
 
 #links
   :::u-button
@@ -34,7 +32,35 @@ No routes or controllers — you own the frontend.
 
 ::u-page-section
 #title
-Why Filament Blog?
+Two install modes
+
+#features
+  :::u-page-feature
+  ---
+  icon: i-lucide-route-off
+  ---
+  #title
+  Headless (default)
+  
+  #description
+  No routes, no controllers, no forced views. Use the Blade components, write your own routing. Your app owns the frontend.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-zap
+  ---
+  #title
+  Public-routes mode (opt-in)
+  
+  #description
+  Flip a config flag — get `/blog`, `/blog/{slug}`, `/blog/category/{slug}`, signed `/blog/preview/{post}`, and optional `/blog/feed`. No Filament panel boot needed.
+  :::
+::
+
+::u-page-section
+#title
+What's in the box
 
 #features
   :::u-page-feature
@@ -45,7 +71,7 @@ Why Filament Blog?
   Filament Admin Panel
   
   #description
-  Full-featured PostResource and CategoryResource with markdown editor, draft/published toggle, SEO fields, and featured images.
+  PostResource and CategoryResource with markdown editor, draft/scheduled UX, SEO fields, featured images, and bulk publish/unpublish/schedule actions.
   :::
 
   :::u-page-feature
@@ -56,7 +82,7 @@ Why Filament Blog?
   SEO Components
   
   #description
-  Ready-to-use Blade components for meta tags, Open Graph, Twitter Cards, JSON-LD structured data, RSS feed, and canonical URLs.
+  Meta tags, Open Graph, Twitter Cards, JSON-LD `BlogPosting`, RSS feed, canonical URLs — all publishable Blade components.
   :::
 
   :::u-page-feature
@@ -67,7 +93,29 @@ Why Filament Blog?
   13 MCP Tools
   
   #description
-  Full CRUD for posts and categories via Model Context Protocol. Let AI agents create, edit, and publish blog posts.
+  Full CRUD for posts and categories via Model Context Protocol with Sanctum ability gating and markdown sanitization (HTML stripped, unsafe links blocked).
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-hash
+  ---
+  #title
+  Tags taxonomy (opt-in)
+  
+  #description
+  Many-to-many `blog_post_tag` table, `TagResource` admin UI, public archive at `/blog/tag/{slug}` — all behind a single config flag.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-image
+  ---
+  #title
+  MediaLibrary integration (opt-in)
+  
+  #description
+  When the flag is on and `spatie/laravel-medialibrary` is installed, featured-image uploads use `SpatieMediaLibraryFileUpload`. Falls back gracefully if the package isn't installed.
   :::
 
   :::u-page-feature
@@ -78,18 +126,7 @@ Why Filament Blog?
   Publishable UI Components
   
   #description
-  Default post-card, post-header, post-body, and related-posts components with dark mode. Publish and fully customize for your design.
-  :::
-
-  :::u-page-feature
-  ---
-  icon: i-lucide-route-off
-  ---
-  #title
-  No Routes Included
-  
-  #description
-  Define your own routes, controllers, and page layouts. The package provides the building blocks — you own the frontend.
+  Post-card, post-header, post-body, related-posts, and more — Tailwind + dark mode out of the box. Publish to fully customize.
   :::
 
   :::u-page-feature
@@ -100,7 +137,18 @@ Why Filament Blog?
   Sitemap Generator
   
   #description
-  Route-aware sitemap generator that automatically adds blog index, categories, and individual posts to your sitemap.
+  Route-aware sitemap helper that automatically adds blog index, categories, tags, and individual posts.
+  :::
+
+  :::u-page-feature
+  ---
+  icon: i-lucide-clock
+  ---
+  #title
+  Reading time + related posts
+  
+  #description
+  `Post::readingTime()` and `Post::relatedPosts()` helpers ship with the model. No extra queries to wire.
   :::
 ::
 
@@ -139,7 +187,7 @@ composer require manukminasyan/filament-blog
 php artisan migrate
 ```
 
-This creates `blog_posts` and `blog_categories` tables.
+This creates `blog_posts`, `blog_categories`, `blog_tags`, and `blog_post_tag` tables. Tag tables are empty unless you enable the `tags` feature.
 
 ### Register Filament Plugin
 
@@ -151,63 +199,128 @@ $panel->plugins([
 ]);
 ```
 
-### Publish Config
+### Publish Config (optional)
 
 ```bash [Terminal]
 php artisan vendor:publish --tag=filament-blog-config
 ```
+::
 
-### Configure
+**Done!** Visit your Filament panel — you'll see the Blog section with Posts and Categories.
+
+## Pick your install mode
+
+The package ships **two install modes**:
+
+| Mode                            | When to use                                                                  | Doc                                                                                                       |
+| ------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Headless (default)**          | You want the Blade components and admin, but full control over routing/views | [Frontend Setup (headless)](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup) |
+| **Public-routes mode (opt-in)** | You want a working blog at `/blog` without writing a single controller       | [Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode)    |
+
+Most teams porting from the Tapix/FilaForms internal blog packages want public-routes mode — it ships the same flow they had, just behind a flag.
+
+## Default config
+
+After publishing, `config/filament-blog.php` looks like this. Everything is opt-in — defaults match the headless mode, so the package is a no-op until you flip a flag:
 
 ```php [config/filament-blog.php]
 return [
     'prefix' => 'blog',
+    'layout' => 'layouts.app',
     'author_model' => \App\Models\User::class,
     'per_page' => 12,
-    'feed' => [
-        'enabled' => true,
-        'title' => 'My Engineering Blog',
-        'description' => 'Latest posts from the team.',
-        'author_email' => 'hello@example.com',
+
+    'features' => [
+        'public_routes' => false,  // /blog, /blog/{slug}, /blog/category/{slug}, signed /blog/preview/{post}
+        'feed'          => false,  // /blog/feed (RSS 2.0)
+        'sitemap'       => false,  // helper for spatie/laravel-sitemap
+        'tags'          => false,  // /blog/tag/{slug}, TagResource admin
+        'media_library' => false,  // SpatieMediaLibraryFileUpload (requires spatie/laravel-medialibrary)
     ],
+
+    'feed' => [
+        'title' => null,         // falls back to config('app.name')
+        'description' => null,
+        'author_email' => null,  // RSS <author> email
+    ],
+
     'publisher' => [
-        'name' => 'My Company',
-        'url' => 'https://example.com',
-        'logo' => 'images/logo.png',
+        'name' => null,    // Organization name (JSON-LD)
+        'url' => null,
+        'logo' => null,    // Path to logo (used with asset())
+    ],
+
+    'tables' => [
+        'posts' => 'blog_posts',
+        'categories' => 'blog_categories',
     ],
 ];
 ```
-::
 
-**Done!** Visit your Filament panel to see the Blog section with Posts and Categories.
+See [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration) for the full reference.
 
 ## Morph Map
 
-If your application enforces morph maps, add the blog models:
+If your app enforces morph maps, register the blog models:
 
 ```php [AppServiceProvider.php]
 Relation::enforceMorphMap([
     // ...existing entries
     'blog_post' => \ManukMinasyan\FilamentBlog\Models\Post::class,
     'blog_category' => \ManukMinasyan\FilamentBlog\Models\Category::class,
+    'blog_tag' => \ManukMinasyan\FilamentBlog\Models\Tag::class,
 ]);
 ```
 
 ## SEO Migration
 
-The package requires `ralphjsmit/laravel-seo`. Publish its migration:
+The package depends on `ralphjsmit/laravel-seo`. Publish its migration:
 
 ```bash [Terminal]
 php artisan vendor:publish --tag=seo-migrations
 php artisan migrate
 ```
 
+## Upgrading from the Tapix/FilaForms internal blog packages
 
-# Frontend Setup
+The schema is identical (`blog_posts` and `blog_categories` table names match). To swap:
 
-This package does not include routes or controllers. You create your own and use the provided Blade components.
+```bash [Terminal]
+composer remove tapix/blog        # or filaforms/blog
+composer require manukminasyan/filament-blog
+```
 
-## Create Routes
+Then enable public-routes mode in config:
+
+```php
+'features' => [
+    'public_routes' => true,
+    'feed' => true,
+],
+```
+
+No data migration needed.
+
+
+# Frontend Setup (headless)
+
+::alert{type="info"}
+**Want a working blog without writing controllers?**
+
+ See 
+
+[Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode)
+
+ — flip a config flag and you're done. This page covers the 
+
+**headless mode**
+
+ for hosts who want full control.
+::
+
+In headless mode the package ships **no routes, no controllers, no page views**. You wire your own routing and use the provided Blade components.
+
+## Create routes
 
 ```php [routes/web.php]
 use App\Http\Controllers\BlogController;
@@ -216,17 +329,21 @@ Route::prefix('blog')->name('blog.')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('index');
     Route::get('/feed', [BlogController::class, 'feed'])->name('feed');
     Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
+    Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('tag');
     Route::get('/preview/{post}', [BlogController::class, 'preview'])
         ->name('preview')->middleware('signed');
     Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
 });
 ```
 
-## Create Controller
+The route names matter — the package's URL helpers and SEO components check for them via `Route::has(...)` and fall back gracefully when missing.
+
+## Create controller
 
 ```php [app/Http/Controllers/BlogController.php]
-use ManukMinasyan\FilamentBlog\Models\Post;
 use ManukMinasyan\FilamentBlog\Models\Category;
+use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Tag;
 
 final readonly class BlogController
 {
@@ -249,16 +366,40 @@ final readonly class BlogController
             ->where('slug', $slug)
             ->firstOrFail();
 
-        $relatedPosts = Post::query()
-            ->published()
-            ->where('id', '!=', $post->id)
-            ->where('category_id', $post->getAttribute('category_id'))
-            ->with(['category'])
-            ->latest('published_at')
-            ->limit(3)
-            ->get();
+        $relatedPosts = $post->relatedPosts()->get();
 
         return view('blog.show', compact('post', 'relatedPosts'));
+    }
+
+    public function category(string $slug): View
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $posts = Post::query()
+            ->where('category_id', $category->id)
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->latest('published_at')
+            ->paginate(config('filament-blog.per_page', 12));
+
+        return view('blog.category', compact('category', 'posts'));
+    }
+
+    public function tag(string $slug): View
+    {
+        $tag = Tag::where('slug', $slug)->firstOrFail();
+        $posts = Post::query()
+            ->whereHas('tags', fn ($q) => $q->where('blog_tags.id', $tag->id))
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->latest('published_at')
+            ->paginate(config('filament-blog.per_page', 12));
+
+        return view('blog.tag', compact('tag', 'posts'));
+    }
+
+    public function preview(Post $post): View
+    {
+        return view('blog.preview', ['post' => $post->loadMissing(['category', 'author', 'seo'])]);
     }
 
     public function feed(): Response
@@ -272,27 +413,24 @@ final readonly class BlogController
 
         return response()
             ->view('blog.feed', compact('posts'))
-            ->header('Content-Type', 'application/rss+xml');
+            ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }
 ```
 
-## Create Views
+## Create views
 
-Use the package's Blade components in your own page layouts:
+Use the package's Blade components inside your own page templates:
 
 ```blade [resources/views/blog/show.blade.php]
 <x-your-layout>
-    {{-- SEO (in <head>) --}}
     @push('head')
         <x-blog::meta-tags :post="$post" />
         <x-blog::feed-link />
     @endpush
 
-    {{-- Structured data --}}
     <x-blog::structured-data :post="$post" />
 
-    {{-- Content --}}
     <x-blog::post-header :post="$post" />
     <x-blog::post-body :post="$post" />
     <x-blog::related-posts :posts="$relatedPosts" />
@@ -313,17 +451,128 @@ Use the package's Blade components in your own page layouts:
 <x-blog::feed :posts="$posts" />
 ```
 
-## Expected Route Names
+## Helpers on the Post model
 
-The package checks for these route names when generating URLs. If a route doesn't exist, it falls back to `#`:
+Useful in your views:
 
-| Route Name      | Purpose                                   |
-| --------------- | ----------------------------------------- |
-| `blog.index`    | Blog listing page                         |
-| `blog.show`     | Single post (param: `slug`)               |
-| `blog.category` | Category page (param: `slug`)             |
-| `blog.preview`  | Draft preview (signed URL, param: `post`) |
-| `blog.feed`     | RSS feed                                  |
+```php
+$post->readingTime();       // int — minutes
+$post->relatedPosts(3);     // Builder of same-category, published, !=$this->id
+$post->getUrl();            // route('blog.show', $post->slug) if registered, else fallback
+```
+
+## Expected route names
+
+The package checks for these names when generating URLs. If a route is missing, the helper returns `#`:
+
+| Name            | Purpose                       |
+| --------------- | ----------------------------- |
+| `blog.index`    | Listing page                  |
+| `blog.show`     | Single post (`slug`)          |
+| `blog.category` | Category archive (`slug`)     |
+| `blog.tag`      | Tag archive (`slug`)          |
+| `blog.preview`  | Signed draft preview (`post`) |
+| `blog.feed`     | RSS feed                      |
+
+## Promote to public-routes mode any time
+
+If writing all this gets old, flip the flag in config and delete your controller — the package will register equivalent routes automatically. See [Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode).
+
+
+# Public-routes mode
+
+The package ships an **opt-in public-routes mode**. Flip a flag in config and you get:
+
+| Route                       | Name            | Notes                                                   |
+| --------------------------- | --------------- | ------------------------------------------------------- |
+| `GET /blog`                 | `blog.index`    | Paginated post listing                                  |
+| `GET /blog/{slug}`          | `blog.show`     | Single post (only published)                            |
+| `GET /blog/category/{slug}` | `blog.category` | Category archive (paginated)                            |
+| `GET /blog/preview/{post}`  | `blog.preview`  | Signed-only draft preview, with `noindex,nofollow` meta |
+| `GET /blog/feed`            | `blog.feed`     | RSS 2.0 feed (gated by `features.feed`)                 |
+| `GET /blog/tag/{slug}`      | `blog.tag`      | Tag archive (gated by `features.tags`)                  |
+
+## Enable it
+
+```php [config/filament-blog.php]
+'features' => [
+    'public_routes' => true,
+    'feed'          => true,   // optional, enables /blog/feed
+    'tags'          => true,   // optional, enables /blog/tag/{slug}
+],
+
+'layout' => 'layouts.app',     // your host layout the page views extend
+```
+
+That's it. The service provider registers the routes at boot — no Filament panel boot is required, so the public site keeps working for guests who never touch the admin.
+
+## Required: a host layout
+
+The page views extend the layout you set in `'layout'`. It must define a `@yield('content')` slot. A minimal example:
+
+```blade [resources/views/layouts/app.blade.php]
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ $title ?? config('app.name') }}</title>
+    @stack('head')
+</head>
+<body class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+    @yield('content')
+</body>
+</html>
+```
+
+If your layout uses a different slot mechanism (e.g. Blade components with `{{ $slot }}`), publish the page views and adapt them:
+
+```bash [Terminal]
+php artisan vendor:publish --tag=filament-blog-views
+```
+
+## Customizing pages
+
+The shipped pages live at:
+
+- `resources/views/vendor/blog/pages/index.blade.php`
+- `resources/views/vendor/blog/pages/show.blade.php`
+- `resources/views/vendor/blog/pages/category.blade.php`
+- `resources/views/vendor/blog/pages/preview.blade.php`
+- `resources/views/vendor/blog/pages/tag.blade.php`
+- `resources/views/vendor/blog/pages/feed.blade.php`
+
+Edit them freely — once published, the package no longer serves its own copies.
+
+## Custom prefix
+
+Change `'prefix' => 'blog'` in config. All routes pick up the new prefix.
+
+## Disabling individual pieces
+
+Each feature flag is independent:
+
+```php
+'features' => [
+    'public_routes' => true,
+    'feed'          => false,   // no RSS feed
+    'tags'          => false,   // no tag archive (admin still works if registered)
+],
+```
+
+When a flag is off, requests to that path return **404** (not registered). `Route::has(...)` returns true (the route is defined) but the controller calls `abort_unless($flag, 404)`. That's a deliberate choice so route ordering stays predictable and you can probe the route name without crashing.
+
+## Mode comparison
+
+|                       | Headless        | Public-routes             |
+| --------------------- | --------------- | ------------------------- |
+| Routes registered     | None            | All 6                     |
+| Controllers           | You write       | Shipped                   |
+| Views                 | Components only | Full pages                |
+| Custom domain logic   | Yes (any)       | Limited to view overrides |
+| Effort to ship a blog | \~2 hours       | \~5 minutes               |
+
+If you outgrow public-routes mode, flip the flag back to `false` and write your own controllers — see [Frontend Setup (headless)](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup).
 
 
 # Blade Components
@@ -433,18 +682,19 @@ The PostResource provides a full CRUD interface for blog posts.
 
 ### Form Fields
 
-| Field          | Type           | Notes                             |
-| -------------- | -------------- | --------------------------------- |
-| Title          | TextInput      | Required, max 255                 |
-| Slug           | TextInput      | Auto-generated, unique            |
-| Content        | MarkdownEditor | Required, full toolbar            |
-| Excerpt        | Textarea       | 3 rows                            |
-| Status         | Toggle         | Published/Draft                   |
-| Published At   | DateTimePicker | Schedule future posts             |
-| Category       | Select         | Searchable, create inline         |
-| Author         | Select         | Defaults to current user          |
-| Featured Image | FileUpload     | Image, public disk                |
-| SEO            | SEO Component  | Title + description (collapsible) |
+| Field          | Type           | Notes                                                                                                                              |
+| -------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Title          | TextInput      | Required, max 255                                                                                                                  |
+| Slug           | TextInput      | Auto-generated, unique, frozen on rename                                                                                           |
+| Content        | MarkdownEditor | Required, full toolbar                                                                                                             |
+| Excerpt        | Textarea       | 3 rows                                                                                                                             |
+| Status         | Toggle         | Hydrates to/from the \`Draft                                                                                                       |
+| Published At   | DateTimePicker | Future value = scheduled                                                                                                           |
+| Category       | Select         | Searchable, create inline                                                                                                          |
+| Tags           | Select         | Multi, searchable, create inline — only visible when `features.tags` is on                                                         |
+| Author         | Select         | Defaults to current user                                                                                                           |
+| Featured Image | FileUpload     | Image, public disk — auto-swaps to `SpatieMediaLibraryFileUpload` when `features.media_library` is on AND the package is installed |
+| SEO            | SEO Component  | Title + description (collapsible)                                                                                                  |
 
 ### List Tabs
 
@@ -456,15 +706,34 @@ Posts are organized into tabs:
 | **Scheduled** | `status = published` AND `published_at > now`  |
 | **Published** | `status = published` AND `published_at <= now` |
 
-### Actions
+### Per-row actions
 
-- **View** — Opens post URL (published) or signed preview URL (draft)
-- **Edit** — Edit post form
-- **Delete / Force Delete / Restore** — Soft delete support
+- **View** — opens the post URL (published) or signed preview URL (draft) in a new tab
+- **Edit** — edit form
+- **Delete / Force Delete / Restore** — soft delete support
+
+### Bulk actions
+
+| Action                              | Effect                                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------------------- |
+| **Publish**                         | Sets `status = Published` and `published_at` to now (or keeps existing if already set) |
+| **Unpublish**                       | Sets `status = Draft` and clears `published_at`                                        |
+| **Schedule**                        | Modal with `DateTimePicker` (min: now); sets `status = Published` + that timestamp     |
+| **Delete / Force Delete / Restore** | Standard soft-delete bulk operations                                                   |
+
+All bulk actions notify on completion and deselect rows.
 
 ## Categories Resource
 
-Simple CRUD for blog categories with name, slug, and post count.
+Simple CRUD for blog categories: `name`, `slug` (auto-generated, unique), `posts_count` column, soft-delete support, trashed filter.
+
+## Tags Resource (opt-in)
+
+Appears in the Blog navigation group when `features.tags` is enabled. Mirrors the Categories resource shape: `name`, `slug` (auto-generated, unique, frozen on rename), `posts_count` column, soft-delete support, trashed filter.
+
+When the flag is off, the resource class still exists but `shouldRegisterNavigation()` returns `false` so it doesn't appear in the sidebar.
+
+See the [Tags Taxonomy](https://manukminasyan.github.io/filament-blog/essentials/tags) page for full schema and usage.
 
 ## Plugin Registration
 
@@ -476,7 +745,7 @@ $panel->plugins([
 ]);
 ```
 
-The plugin auto-discovers PostResource and CategoryResource under the "Blog" navigation group.
+The plugin auto-discovers `PostResource`, `CategoryResource`, and `TagResource` under the "Blog" navigation group. Resources hidden by feature flags don't appear in the sidebar — they're still resolvable for tests and direct URL access.
 
 
 # MCP Tools
@@ -533,7 +802,7 @@ class BlogServer extends Server
 }
 ```
 
-All tools require admin authentication and specific token abilities.
+All tools require admin authentication and specific token abilities (Sanctum). The `CreatePostTool` and `UpdatePostTool` sanitize incoming markdown via `Str::markdown` with `html_input='strip'` and `allow_unsafe_links=false` — HTML is stripped, `javascript:` URLs are blocked.
 
 
 # Configuration
@@ -544,37 +813,116 @@ Publish the config file:
 php artisan vendor:publish --tag=filament-blog-config
 ```
 
-## Full Reference
+## Full reference
 
 ```php [config/filament-blog.php]
 return [
-    // Route prefix for blog URLs
+    /*
+    |--------------------------------------------------------------------------
+    | Route prefix
+    |--------------------------------------------------------------------------
+    | The URI prefix for all blog routes when public-routes mode is enabled.
+    | Used as: /{prefix}, /{prefix}/{slug}, /{prefix}/category/{slug}, etc.
+    */
     'prefix' => 'blog',
 
-    // Model class for blog post authors
+    /*
+    |--------------------------------------------------------------------------
+    | Layout view
+    |--------------------------------------------------------------------------
+    | The Blade layout the shipped page views extend (when public-routes mode
+    | is enabled). Must define a @yield('content') slot. Ignored in headless
+    | mode.
+    */
+    'layout' => 'layouts.app',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Author model
+    |--------------------------------------------------------------------------
+    | The Eloquent model used as the post author. Must have an integer or
+    | string primary key matching the type of `users.id`.
+    */
     'author_model' => \App\Models\User::class,
 
-    // Posts per page in listings
+    /*
+    |--------------------------------------------------------------------------
+    | Posts per page
+    |--------------------------------------------------------------------------
+    | Used by the index/category/tag listing pages.
+    */
     'per_page' => 12,
 
-    // RSS feed configuration
-    'feed' => [
-        'enabled' => true,
-        'title' => null,        // Falls back to app.name + " Blog"
-        'description' => null,
-        'author_email' => null,  // Used in RSS <author> tags
+    /*
+    |--------------------------------------------------------------------------
+    | Feature flags
+    |--------------------------------------------------------------------------
+    | All opt-in. Defaults match the headless install — flip flags to enable.
+    */
+    'features' => [
+        // Register /blog, /blog/{slug}, /blog/category/{slug}, signed
+        // /blog/preview/{post}. See: getting-started/public-routes-mode
+        'public_routes' => false,
+
+        // Register /blog/feed (RSS 2.0). Independent of public_routes —
+        // when enabled alone, only the feed route is registered.
+        'feed' => false,
+
+        // Hint for the BlogSitemapGenerator. Today the helper works
+        // regardless; the flag is reserved for an auto-discovery hook
+        // tracked in the Phase 3 roadmap.
+        'sitemap' => false,
+
+        // Show TagResource in the admin nav, the multi-select tags field
+        // on the Post form, and the /blog/tag/{slug} archive route.
+        // See: essentials/tags
+        'tags' => false,
+
+        // Use SpatieMediaLibraryFileUpload for the featured-image field
+        // when both this flag is on AND spatie/laravel-medialibrary is
+        // installed. See: essentials/media-library
+        'media_library' => false,
     ],
 
-    // Publisher info for JSON-LD structured data
+    /*
+    |--------------------------------------------------------------------------
+    | RSS feed metadata
+    |--------------------------------------------------------------------------
+    */
+    'feed' => [
+        'title' => null,         // falls back to config('app.name')
+        'description' => null,
+        'author_email' => null,  // RSS <author> tag email
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | JSON-LD publisher block
+    |--------------------------------------------------------------------------
+    | Used by <x-blog::structured-data> and the Post::getDynamicSEOData()
+    | Article schema. Leave nulls to omit fields.
+    */
     'publisher' => [
         'name' => null,    // Organization name
         'url' => null,     // Organization URL
-        'logo' => null,    // Path to logo (used with asset())
+        'logo' => null,    // Path used with asset()
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Table names
+    |--------------------------------------------------------------------------
+    | Override if blog_posts/blog_categories collide with existing tables in
+    | your application. Migrations and models pick these up.
+    */
+    'tables' => [
+        'posts' => 'blog_posts',
+        'categories' => 'blog_categories',
     ],
 ];
 ```
 
-## Sitemap Integration
+## Sitemap integration
 
 Add blog URLs to your sitemap generation:
 
@@ -589,15 +937,229 @@ $sitemap->writeToFile(public_path('sitemap.xml'));
 
 The generator is route-aware — it only adds URLs for routes that exist in your application.
 
-## Customizing Views
+## Customizing views
 
-Publish all Blade component views:
+Publish all Blade page + component views:
 
 ```bash [Terminal]
 php artisan vendor:publish --tag=filament-blog-views
 ```
 
-Published views go to `resources/views/vendor/blog/components/`. Edit them to match your design system.
+Published files go to:
+
+- `resources/views/vendor/blog/components/` — the publishable components used in headless mode
+- `resources/views/vendor/blog/pages/` — the page views used in public-routes mode
+
+Edit them to match your design system. Once published, the package no longer serves its own copies of those files.
+
+## Customizing translations
+
+```bash [Terminal]
+php artisan vendor:publish --tag=filament-blog-translations
+```
+
+(No translations ship by default; this tag exists for future localization.)
+
+
+# Tags Taxonomy
+
+Tags are an **opt-in** feature — the schema ships with every install but the admin UI, form field, and public archive only appear when `features.tags` is on.
+
+## Enable
+
+```php [config/filament-blog.php]
+'features' => [
+    'tags' => true,
+],
+```
+
+That single flag activates:
+
+- **`TagResource`** in the Filament admin (Blog group, after Categories)
+- **Multi-select tags field** on the Post create/edit form (with inline create)
+- **Public archive route** at `/blog/tag/{slug}` (when `public_routes` is also on)
+- **`Post::tags()`** relation always exists; without the flag the table is just empty
+
+## Schema
+
+Two tables, both shipped via the package's discovered migrations:
+
+```text
+blog_tags                blog_post_tag (pivot)
+─────────────            ───────────────
+id                       post_id  → blog_posts.id (cascade)
+name                     tag_id   → blog_tags.id  (cascade)
+slug (unique)            created_at
+deleted_at               updated_at
+created_at               primary (post_id, tag_id)
+updated_at               index   (tag_id)
+```
+
+Soft deletes are enabled on `blog_tags`. Pivot rows cascade-delete when a post or tag is force-deleted.
+
+## Model
+
+`ManukMinasyan\FilamentBlog\Models\Tag`:
+
+```php
+$tag = Tag::factory()->create(['name' => 'Laravel']);
+$tag->slug;     // "laravel" — auto-generated, frozen on rename
+$tag->posts;    // BelongsToMany<Post>
+```
+
+The slug is stable — renaming a tag preserves its slug (and existing URLs).
+
+## Attaching tags to posts
+
+```php
+use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Tag;
+
+$post = Post::find($id);
+$tag = Tag::firstOrCreate(['name' => 'Laravel']);
+
+$post->tags()->attach($tag);              // single
+$post->tags()->sync([$tagA->id, $tagB->id]); // replace set
+$post->tags()->detach($tag);              // remove one
+```
+
+In the Filament admin, the multi-select tags field handles this for you — and supports inline create:
+
+```php
+Select::make('tags')
+    ->relationship('tags', 'name')
+    ->multiple()
+    ->searchable()
+    ->preload()
+    ->createOptionForm([
+        TextInput::make('name')->required(),
+    ]);
+```
+
+## Public archive
+
+When both `features.public_routes` and `features.tags` are on, the route `/blog/tag/{slug}` lists published posts for that tag:
+
+```php [routes/web.php]
+// auto-registered by the package
+Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
+```
+
+The shipped view at `resources/views/vendor/blog/pages/tag.blade.php` uses the `<x-blog::post-card>` component. Publish and edit it to customize.
+
+## Disabling tags after enabling
+
+Flip the flag back to `false` and the admin UI + archive route disappear. Existing data stays in the tables — uninstall fully via:
+
+```bash [Terminal]
+php artisan migrate:rollback --path=vendor/manukminasyan/filament-blog/database/migrations
+```
+
+## Related-posts behavior
+
+`Post::relatedPosts()` currently uses **category** matching, not tags. If you want tag-based relations, override it in your own model that extends the package's Post:
+
+```php
+public function relatedPosts(int $limit = 3): Builder
+{
+    $tagIds = $this->tags()->pluck('blog_tags.id');
+
+    return static::query()
+        ->published()
+        ->where('id', '!=', $this->getKey())
+        ->whereHas('tags', fn ($q) => $q->whereIn('blog_tags.id', $tagIds))
+        ->latest('published_at')
+        ->limit($limit);
+}
+```
+
+
+# MediaLibrary Integration
+
+The package ships an **opt-in** integration with [`spatie/laravel-medialibrary`](https://spatie.be/docs/laravel-medialibrary){rel="nofollow"}. When enabled, the featured-image upload uses `SpatieMediaLibraryFileUpload` instead of the default `FileUpload`.
+
+::alert{type="info"}
+**MediaLibrary is not a hard dependency.**
+
+ If you don't install it, the form gracefully falls back to the plain 
+
+`FileUpload`
+
+ — no crash. Flipping 
+
+`features.media_library`
+
+ without installing MediaLibrary is a no-op.
+::
+
+## Enable
+
+1. Install the package:
+   ```bash [Terminal]
+   composer require spatie/laravel-medialibrary
+   php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="medialibrary-migrations"
+   php artisan migrate
+   ```
+2. Flip the flag:
+   ```php [config/filament-blog.php]
+   'features' => [
+       'media_library' => true,
+   ],
+   ```
+3. Use the form as usual — the featured-image field now writes to the MediaLibrary `media` table on a `featured_image` collection.
+
+## Form-side only (for now)
+
+This integration covers the **admin form-component swap only**. The model-side integration (implementing `HasMedia`, registering collections via `registerMediaCollections()`, migrating existing `featured_image` string column data) is intentionally deferred — that requires careful schema-migration design that doesn't fit a feature-flag layer.
+
+If you want the full integration today, override the `Post` model in your app:
+
+```php [app/Models/BlogPost.php]
+namespace App\Models;
+
+use ManukMinasyan\FilamentBlog\Models\Post as BasePost;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
+
+class BlogPost extends BasePost implements HasMedia
+{
+    use InteractsWithMedia;
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('featured_image')->singleFile();
+    }
+}
+```
+
+Then point the package at your model:
+
+```php [config/filament-blog.php]
+// (post_model is not currently a config key — track this in
+// Phase 3 follow-up; for now the package always uses its own Post)
+```
+
+::alert{type="warning"}
+Swapping the post model isn't a config option in v1.4 — that lands in Phase 3 along with the model-side integration. Watch the 
+
+[GitHub releases](https://github.com/ManukMinasyan/filament-blog/releases){rel="nofollow"}
+
+ for 
+
+`v1.5`
+
+.
+::
+
+## Migrating existing `featured_image` data
+
+When Phase 3 lands, existing posts with a `featured_image` string path will be migrated to MediaLibrary entries via a console command. Until then, two options:
+
+1. **Stay on `FileUpload`** — leave the flag off. No migration required.
+2. **Manual migration** — write your own script to copy `featured_image` files into MediaLibrary on a `featured_image` collection.
+
+Both Tapix and FilaForms blogs (which this package replaces) use the same string-column approach, so flipping the flag without migration leaves you in a usable state — new posts go to MediaLibrary, old posts keep using the string path. The shipped views render whichever exists.
 
 
 # Contributing

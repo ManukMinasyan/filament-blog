@@ -1,6 +1,6 @@
 # Filament Admin
 
-> Managing blog posts and categories in the Filament admin panel.
+> Managing blog posts, categories, and tags in the Filament admin panel.
 
 ## Posts Resource
 
@@ -50,7 +50,7 @@ The PostResource provides a full CRUD interface for blog posts.
     </td>
     
     <td>
-      Auto-generated, unique
+      Auto-generated, unique, frozen on rename
     </td>
   </tr>
   
@@ -92,7 +92,7 @@ The PostResource provides a full CRUD interface for blog posts.
     </td>
     
     <td>
-      Published/Draft
+      Hydrates to/from the `Draft
     </td>
   </tr>
   
@@ -106,7 +106,7 @@ The PostResource provides a full CRUD interface for blog posts.
     </td>
     
     <td>
-      Schedule future posts
+      Future value = scheduled
     </td>
   </tr>
   
@@ -121,6 +121,24 @@ The PostResource provides a full CRUD interface for blog posts.
     
     <td>
       Searchable, create inline
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      Tags
+    </td>
+    
+    <td>
+      Select
+    </td>
+    
+    <td>
+      Multi, searchable, create inline — only visible when <code>
+        features.tags
+      </code>
+      
+       is on
     </td>
   </tr>
   
@@ -148,7 +166,15 @@ The PostResource provides a full CRUD interface for blog posts.
     </td>
     
     <td>
-      Image, public disk
+      Image, public disk — auto-swaps to <code>
+        SpatieMediaLibraryFileUpload
+      </code>
+      
+       when <code>
+        features.media_library
+      </code>
+      
+       is on AND the package is installed
     </td>
   </tr>
   
@@ -238,15 +264,113 @@ Posts are organized into tabs:
 </tbody>
 </table>
 
-### Actions
+### Per-row actions
 
-- **View** — Opens post URL (published) or signed preview URL (draft)
-- **Edit** — Edit post form
-- **Delete / Force Delete / Restore** — Soft delete support
+- **View** — opens the post URL (published) or signed preview URL (draft) in a new tab
+- **Edit** — edit form
+- **Delete / Force Delete / Restore** — soft delete support
+
+### Bulk actions
+
+<table>
+<thead>
+  <tr>
+    <th>
+      Action
+    </th>
+    
+    <th>
+      Effect
+    </th>
+  </tr>
+</thead>
+
+<tbody>
+  <tr>
+    <td>
+      <strong>
+        Publish
+      </strong>
+    </td>
+    
+    <td>
+      Sets <code>
+        status = Published
+      </code>
+      
+       and <code>
+        published_at
+      </code>
+      
+       to now (or keeps existing if already set)
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <strong>
+        Unpublish
+      </strong>
+    </td>
+    
+    <td>
+      Sets <code>
+        status = Draft
+      </code>
+      
+       and clears <code>
+        published_at
+      </code>
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <strong>
+        Schedule
+      </strong>
+    </td>
+    
+    <td>
+      Modal with <code>
+        DateTimePicker
+      </code>
+      
+       (min: now); sets <code>
+        status = Published
+      </code>
+      
+       + that timestamp
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <strong>
+        Delete / Force Delete / Restore
+      </strong>
+    </td>
+    
+    <td>
+      Standard soft-delete bulk operations
+    </td>
+  </tr>
+</tbody>
+</table>
+
+All bulk actions notify on completion and deselect rows.
 
 ## Categories Resource
 
-Simple CRUD for blog categories with name, slug, and post count.
+Simple CRUD for blog categories: `name`, `slug` (auto-generated, unique), `posts_count` column, soft-delete support, trashed filter.
+
+## Tags Resource (opt-in)
+
+Appears in the Blog navigation group when `features.tags` is enabled. Mirrors the Categories resource shape: `name`, `slug` (auto-generated, unique, frozen on rename), `posts_count` column, soft-delete support, trashed filter.
+
+When the flag is off, the resource class still exists but `shouldRegisterNavigation()` returns `false` so it doesn't appear in the sidebar.
+
+See the [Tags Taxonomy](/essentials/tags) page for full schema and usage.
 
 ## Plugin Registration
 
@@ -258,4 +382,4 @@ $panel->plugins([
 ]);
 ```
 
-The plugin auto-discovers PostResource and CategoryResource under the "Blog" navigation group.
+The plugin auto-discovers `PostResource`, `CategoryResource`, and `TagResource` under the "Blog" navigation group. Resources hidden by feature flags don't appear in the sidebar — they're still resolvable for tests and direct URL access.

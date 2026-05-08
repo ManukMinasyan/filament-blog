@@ -1,10 +1,16 @@
-# Frontend Setup
+# Frontend Setup (headless)
 
-> Build your own blog frontend using the package's components.
+> Build your own blog frontend using the package's Blade components.
 
-This package does not include routes or controllers. You create your own and use the provided Blade components.
+<alert type="info">
 
-## Create Routes
+**Want a working blog without writing controllers?** See [Public-routes mode](/getting-started/public-routes-mode) — flip a config flag and you're done. This page covers the **headless mode** for hosts who want full control.
+
+</alert>
+
+In headless mode the package ships **no routes, no controllers, no page views**. You wire your own routing and use the provided Blade components.
+
+## Create routes
 
 ```php [routes/web.php]
 use App\Http\Controllers\BlogController;
@@ -13,17 +19,21 @@ Route::prefix('blog')->name('blog.')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('index');
     Route::get('/feed', [BlogController::class, 'feed'])->name('feed');
     Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
+    Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('tag');
     Route::get('/preview/{post}', [BlogController::class, 'preview'])
         ->name('preview')->middleware('signed');
     Route::get('/{slug}', [BlogController::class, 'show'])->name('show');
 });
 ```
 
-## Create Controller
+The route names matter — the package's URL helpers and SEO components check for them via `Route::has(...)` and fall back gracefully when missing.
+
+## Create controller
 
 ```php [app/Http/Controllers/BlogController.php]
-use ManukMinasyan\FilamentBlog\Models\Post;
 use ManukMinasyan\FilamentBlog\Models\Category;
+use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Tag;
 
 final readonly class BlogController
 {
@@ -46,16 +56,40 @@ final readonly class BlogController
             ->where('slug', $slug)
             ->firstOrFail();
 
-        $relatedPosts = Post::query()
-            ->published()
-            ->where('id', '!=', $post->id)
-            ->where('category_id', $post->getAttribute('category_id'))
-            ->with(['category'])
-            ->latest('published_at')
-            ->limit(3)
-            ->get();
+        $relatedPosts = $post->relatedPosts()->get();
 
         return view('blog.show', compact('post', 'relatedPosts'));
+    }
+
+    public function category(string $slug): View
+    {
+        $category = Category::where('slug', $slug)->firstOrFail();
+        $posts = Post::query()
+            ->where('category_id', $category->id)
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->latest('published_at')
+            ->paginate(config('filament-blog.per_page', 12));
+
+        return view('blog.category', compact('category', 'posts'));
+    }
+
+    public function tag(string $slug): View
+    {
+        $tag = Tag::where('slug', $slug)->firstOrFail();
+        $posts = Post::query()
+            ->whereHas('tags', fn ($q) => $q->where('blog_tags.id', $tag->id))
+            ->published()
+            ->with(['category', 'author', 'seo'])
+            ->latest('published_at')
+            ->paginate(config('filament-blog.per_page', 12));
+
+        return view('blog.tag', compact('tag', 'posts'));
+    }
+
+    public function preview(Post $post): View
+    {
+        return view('blog.preview', ['post' => $post->loadMissing(['category', 'author', 'seo'])]);
     }
 
     public function feed(): Response
@@ -69,27 +103,24 @@ final readonly class BlogController
 
         return response()
             ->view('blog.feed', compact('posts'))
-            ->header('Content-Type', 'application/rss+xml');
+            ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }
 ```
 
-## Create Views
+## Create views
 
-Use the package's Blade components in your own page layouts:
+Use the package's Blade components inside your own page templates:
 
 ```blade [resources/views/blog/show.blade.php]
 <x-your-layout>
-    {{-- SEO (in <head>) --}}
     @push('head')
         <x-blog::meta-tags :post="$post" />
         <x-blog::feed-link />
     @endpush
 
-    {{-- Structured data --}}
     <x-blog::structured-data :post="$post" />
 
-    {{-- Content --}}
     <x-blog::post-header :post="$post" />
     <x-blog::post-body :post="$post" />
     <x-blog::related-posts :posts="$relatedPosts" />
@@ -110,15 +141,25 @@ Use the package's Blade components in your own page layouts:
 <x-blog::feed :posts="$posts" />
 ```
 
-## Expected Route Names
+## Helpers on the Post model
 
-The package checks for these route names when generating URLs. If a route doesn't exist, it falls back to `#`:
+Useful in your views:
+
+```php
+$post->readingTime();       // int — minutes
+$post->relatedPosts(3);     // Builder of same-category, published, !=$this->id
+$post->getUrl();            // route('blog.show', $post->slug) if registered, else fallback
+```
+
+## Expected route names
+
+The package checks for these names when generating URLs. If a route is missing, the helper returns `#`:
 
 <table>
 <thead>
   <tr>
     <th>
-      Route Name
+      Name
     </th>
     
     <th>
@@ -136,7 +177,7 @@ The package checks for these route names when generating URLs. If a route doesn'
     </td>
     
     <td>
-      Blog listing page
+      Listing page
     </td>
   </tr>
   
@@ -148,7 +189,7 @@ The package checks for these route names when generating URLs. If a route doesn'
     </td>
     
     <td>
-      Single post (param: <code>
+      Single post (<code>
         slug
       </code>
       
@@ -164,7 +205,23 @@ The package checks for these route names when generating URLs. If a route doesn'
     </td>
     
     <td>
-      Category page (param: <code>
+      Category archive (<code>
+        slug
+      </code>
+      
+      )
+    </td>
+  </tr>
+  
+  <tr>
+    <td>
+      <code>
+        blog.tag
+      </code>
+    </td>
+    
+    <td>
+      Tag archive (<code>
         slug
       </code>
       
@@ -180,7 +237,7 @@ The package checks for these route names when generating URLs. If a route doesn'
     </td>
     
     <td>
-      Draft preview (signed URL, param: <code>
+      Signed draft preview (<code>
         post
       </code>
       
@@ -201,3 +258,7 @@ The package checks for these route names when generating URLs. If a route doesn'
   </tr>
 </tbody>
 </table>
+
+## Promote to public-routes mode any time
+
+If writing all this gets old, flip the flag in config and delete your controller — the package will register equivalent routes automatically. See [Public-routes mode](/getting-started/public-routes-mode).

@@ -1,0 +1,113 @@
+# Tags Taxonomy
+
+> Opt-in many-to-many tags taxonomy with admin UI and public archive.
+
+Tags are an **opt-in** feature — the schema ships with every install but the admin UI, form field, and public archive only appear when `features.tags` is on.
+
+## Enable
+
+```php [config/filament-blog.php]
+'features' => [
+    'tags' => true,
+],
+```
+
+That single flag activates:
+
+- **TagResource** in the Filament admin (Blog group, after Categories)
+- **Multi-select tags field** on the Post create/edit form (with inline create)
+- **Public archive route** at `/blog/tag/{slug}` (when `public_routes` is also on)
+- **Post::tags()** relation always exists; without the flag the table is just empty
+
+## Schema
+
+Two tables, both shipped via the package's discovered migrations:
+
+```text
+blog_tags                blog_post_tag (pivot)
+─────────────            ───────────────
+id                       post_id  → blog_posts.id (cascade)
+name                     tag_id   → blog_tags.id  (cascade)
+slug (unique)            created_at
+deleted_at               updated_at
+created_at               primary (post_id, tag_id)
+updated_at               index   (tag_id)
+```
+
+Soft deletes are enabled on `blog_tags`. Pivot rows cascade-delete when a post or tag is force-deleted.
+
+## Model
+
+`ManukMinasyan\FilamentBlog\Models\Tag`:
+
+```php
+$tag = Tag::factory()->create(['name' => 'Laravel']);
+$tag->slug;     // "laravel" — auto-generated, frozen on rename
+$tag->posts;    // BelongsToMany<Post>
+```
+
+The slug is stable — renaming a tag preserves its slug (and existing URLs).
+
+## Attaching tags to posts
+
+```php
+use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Tag;
+
+$post = Post::find($id);
+$tag = Tag::firstOrCreate(['name' => 'Laravel']);
+
+$post->tags()->attach($tag);              // single
+$post->tags()->sync([$tagA->id, $tagB->id]); // replace set
+$post->tags()->detach($tag);              // remove one
+```
+
+In the Filament admin, the multi-select tags field handles this for you — and supports inline create:
+
+```php
+Select::make('tags')
+    ->relationship('tags', 'name')
+    ->multiple()
+    ->searchable()
+    ->preload()
+    ->createOptionForm([
+        TextInput::make('name')->required(),
+    ]);
+```
+
+## Public archive
+
+When both `features.public_routes` and `features.tags` are on, the route `/blog/tag/{slug}` lists published posts for that tag:
+
+```php [routes/web.php]
+// auto-registered by the package
+Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
+```
+
+The shipped view at `resources/views/vendor/blog/pages/tag.blade.php` uses the `<x-blog::post-card>` component. Publish and edit it to customize.
+
+## Disabling tags after enabling
+
+Flip the flag back to `false` and the admin UI + archive route disappear. Existing data stays in the tables — uninstall fully via:
+
+```bash [Terminal]
+php artisan migrate:rollback --path=vendor/manukminasyan/filament-blog/database/migrations
+```
+
+## Related-posts behavior
+
+`Post::relatedPosts()` currently uses **category** matching, not tags. If you want tag-based relations, override it in your own model that extends the package's Post:
+
+```php
+public function relatedPosts(int $limit = 3): Builder
+{
+    $tagIds = $this->tags()->pluck('blog_tags.id');
+
+    return static::query()
+        ->published()
+        ->where('id', '!=', $this->getKey())
+        ->whereHas('tags', fn ($q) => $q->whereIn('blog_tags.id', $tagIds))
+        ->latest('published_at')
+        ->limit($limit);
+}
+```

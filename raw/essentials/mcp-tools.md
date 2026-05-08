@@ -369,4 +369,4 @@ class BlogServer extends Server
 }
 ```
 
-All tools require admin authentication and specific token abilities.
+All tools require admin authentication and specific token abilities (Sanctum). The `CreatePostTool` and `UpdatePostTool` sanitize incoming markdown via `Str::markdown` with `html_input='strip'` and `allow_unsafe_links=false` — HTML is stripped, `javascript:` URLs are blocked.

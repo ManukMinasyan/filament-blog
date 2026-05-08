@@ -6,15 +6,18 @@
 
 ## Landing
 
-- [Filament Blog - Headless Blog Package](https://manukminasyan.github.io/filament-blog): Headless blog package for Filament with SEO components, MCP tools, and publishable UI components. No routes included.
+- [Filament Blog - Headless Blog Package](https://manukminasyan.github.io/filament-blog): Headless-by-default blog package for Filament. Opt-in public routes, tags taxonomy, MediaLibrary integration, MCP tools, and SEO components — your app stays in control.
 
 ## Docs
 
 - [Installation](https://manukminasyan.github.io/filament-blog/getting-started/installation): Install Filament Blog in your Laravel application.
-- [Frontend Setup](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup): Build your own blog frontend using the package's components.
+- [Frontend Setup (headless)](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup): Build your own blog frontend using the package's Blade components.
+- [Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode): Get a working blog at /blog without writing controllers — opt in via config flags.
 - [Blade Components](https://manukminasyan.github.io/filament-blog/essentials/blade-components): All available Blade components for building your blog frontend.
-- [Filament Admin](https://manukminasyan.github.io/filament-blog/essentials/filament-admin): Managing blog posts and categories in the Filament admin panel.
+- [Filament Admin](https://manukminasyan.github.io/filament-blog/essentials/filament-admin): Managing blog posts, categories, and tags in the Filament admin panel.
 - [MCP Tools](https://manukminasyan.github.io/filament-blog/essentials/mcp-tools): 13 MCP tools for AI agent blog management.
 - [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration): Full configuration reference for Filament Blog.
+- [Tags Taxonomy](https://manukminasyan.github.io/filament-blog/essentials/tags): Opt-in many-to-many tags taxonomy with admin UI and public archive.
+- [MediaLibrary Integration](https://manukminasyan.github.io/filament-blog/essentials/media-library): Opt-in featured-image upload via spatie/laravel-medialibrary.
 - [Contributing](https://manukminasyan.github.io/filament-blog/community/contributing): How to contribute to Filament Blog.
 - [License](https://manukminasyan.github.io/filament-blog/community/license): License information.
