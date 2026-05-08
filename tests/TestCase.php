@@ -19,7 +19,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Livewire\LivewireServiceProvider;
 use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
-use RalphJSmit\Laravel\SEO\SEOServiceProvider as RalphSEOServiceProvider;
+use RalphJSmit\Laravel\SEO\LaravelSEOServiceProvider as RalphSEOServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -54,19 +54,35 @@ class TestCase extends BaseTestCase
 
         $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
+        $app['config']->set('filament-blog.author_model', \Illuminate\Foundation\Auth\User::class);
+
         $app['view']->addNamespace('tests', __DIR__.'/Fixtures/views');
     }
 
     protected function defineDatabaseMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $schema = $this->app['db']->connection()->getSchemaBuilder();
 
-        $this->app['db']->connection()->getSchemaBuilder()
-            ->create('users', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('email')->unique();
-                $table->timestamps();
-            });
+        // Stub host tables the package's migrations and trait dependencies expect.
+        $schema->create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamps();
+        });
+
+        $schema->create('seo', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('model');
+            $table->longText('description')->nullable();
+            $table->string('title')->nullable();
+            $table->string('image')->nullable();
+            $table->string('author')->nullable();
+            $table->string('robots')->nullable();
+            $table->string('canonical_url')->nullable();
+            $table->timestamps();
+        });
+
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 }
