@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ManukMinasyan\FilamentBlog\Models;
 
-use ManukMinasyan\FilamentBlog\Database\Factories\PostFactory;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +15,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use ManukMinasyan\FilamentBlog\Database\Factories\PostFactory;
+use ManukMinasyan\FilamentBlog\Enums\PostStatus;
 use RalphJSmit\Laravel\SEO\Schema\ArticleSchema;
 use RalphJSmit\Laravel\SEO\Schema\BreadcrumbListSchema;
 use RalphJSmit\Laravel\SEO\SchemaCollection;
@@ -134,6 +134,27 @@ class Post extends Model
             "post-rendered:{$this->id}",
             fn (): string => app(MarkdownRenderer::class)->toHtml($this->content),
         );
+    }
+
+    public function readingTime(int $wordsPerMinute = 200): int
+    {
+        $words = str_word_count(strip_tags((string) $this->content));
+
+        return max(1, (int) ceil($words / $wordsPerMinute));
+    }
+
+    public function relatedPosts(int $limit = 3): Builder
+    {
+        return static::query()
+            ->published()
+            ->where($this->getKeyName(), '!=', $this->getKey())
+            ->when(
+                $this->category_id,
+                fn (Builder $q) => $q->where('category_id', $this->category_id),
+                fn (Builder $q) => $q->whereRaw('1 = 0'),
+            )
+            ->latest('published_at')
+            ->limit($limit);
     }
 
     public function getUrl(): string

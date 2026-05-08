@@ -1,0 +1,10 @@
+@extends(config('filament-blog.layout', 'layouts.app'))
+
+@section('content')
+<article class="max-w-2xl mx-auto px-4 py-12 prose dark:prose-invert">
+    <h1>{{ $post->title }}</h1>
+    <div class="post-body">
+        {!! \Illuminate\Support\Str::markdown($post->content ?? '') !!}
+    </div>
+</article>
+@endsection

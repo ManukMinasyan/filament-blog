@@ -1,20 +1,23 @@
 # Filament Blog
 
-Headless blog package for Filament applications. Provides models, Filament admin, MCP tools, SEO components, and publishable UI components — no routes or controllers included.
+Headless blog package for Filament applications. Provides models, Filament admin, MCP tools, SEO components, publishable UI components, and an **opt-in public-routes mode** for hosts that just want a working blog without writing controllers.
 
 ## Features
 
-- **Filament Admin** — Full PostResource and CategoryResource with markdown editor, draft/published toggle, SEO fields, and featured images
+- **Filament Admin** — PostResource and CategoryResource with markdown editor, draft/published/scheduled UX, SEO fields, featured images, and bulk publish/unpublish/schedule actions
 - **SEO Components** — Meta tags, Open Graph, Twitter Cards, JSON-LD structured data, RSS feed, canonical URLs
-- **13 MCP Tools** — Full CRUD for posts and categories via Model Context Protocol
+- **13 MCP Tools** — Full CRUD for posts and categories via Model Context Protocol, with markdown sanitization (HTML stripped, unsafe links blocked)
 - **Publishable UI Components** — Post card, header, body, related posts, category badge, preview banner — all with dark mode
-- **No Routes** — Define your own routes, controllers, and page layouts
+- **Two install modes**
+  - **Headless (default)** — define your own routes/controllers, use the Blade components
+  - **Public-routes mode (opt-in)** — flip a config flag, get `/blog`, `/blog/{slug}`, `/blog/category/{slug}`, signed `/blog/preview/{post}`, and optional `/blog/feed`
 - **Sitemap Generator** — Route-aware sitemap integration via spatie/laravel-sitemap
+- **Reading-time + related-posts** helpers on the Post model
 
 ## Requirements
 
 - PHP 8.4+
-- Laravel 12+
+- Laravel 12+ or 13
 - Filament 5.x
 
 ## Installation
@@ -34,6 +37,30 @@ Register the plugin and run migrations:
 php artisan migrate
 ```
 
+## Public-routes mode (opt-in)
+
+By default this package is fully headless: no routes, no controllers, no forced views. Your app owns all rendering.
+
+To get a working blog at `/blog` without writing any controllers, flip the feature flag:
+
+```php
+// config/filament-blog.php
+'features' => [
+    'public_routes' => true,   // /blog, /blog/{slug}, /blog/category/{slug}, /blog/preview/{post}
+    'feed'          => true,   // adds /blog/feed (RSS 2.0)
+],
+
+'layout' => 'layouts.app',     // your host layout to extend
+```
+
+Routes register at the service-provider level — no Filament panel boot is required, so the public site keeps working for guests who never touch the admin.
+
+Publish the views if you want to customize them:
+
+```bash
+php artisan vendor:publish --tag=filament-blog-views
+```
+
 ## Documentation
 
 **[Read the full documentation →](https://manukminasyan.github.io/filament-blog/)**
@@ -45,7 +72,7 @@ php artisan migrate
 - [MCP Tools](https://manukminasyan.github.io/filament-blog/essentials/mcp-tools)
 - [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration)
 
-## Quick Example
+## Quick Example (headless)
 
 ```blade
 {{-- In your blog show page --}}
@@ -58,7 +85,7 @@ php artisan migrate
     <x-blog::structured-data :post="$post" />
     <x-blog::post-header :post="$post" />
     <x-blog::post-body :post="$post" />
-    <x-blog::related-posts :posts="$relatedPosts" />
+    <x-blog::related-posts :post="$post" />
 </x-your-layout>
 ```
 

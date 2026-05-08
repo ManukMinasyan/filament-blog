@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ManukMinasyan\FilamentBlog\Mcp\Tools;
 
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Models\Post;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\JsonSchema\Types\Type;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -13,6 +14,8 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
+use ManukMinasyan\FilamentBlog\Enums\PostStatus;
+use ManukMinasyan\FilamentBlog\Models\Post;
 
 #[Description('Create a new blog post. Slug is auto-generated from title. Set status to "published" and published_at to publish immediately.')]
 class CreatePostTool extends Tool
@@ -77,7 +80,7 @@ class CreatePostTool extends Tool
         ]);
     }
 
-    /** @return array<string, \Illuminate\JsonSchema\Types\Type> */
+    /** @return array<string, Type> */
     public function schema(JsonSchema $schema): array
     {
         return [

@@ -26,5 +26,9 @@ class FilamentBlogServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         Blade::componentNamespace('ManukMinasyan\\FilamentBlog\\Components', 'blog');
+
+        if (config('filament-blog.features.public_routes')) {
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        }
     }
 }

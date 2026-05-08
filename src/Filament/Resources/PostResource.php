@@ -1,13 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ManukMinasyan\FilamentBlog\Filament\Resources;
 
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\CreatePost;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\EditPost;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\ListPosts;
-use ManukMinasyan\FilamentBlog\Models\Post;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -23,6 +21,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -33,6 +32,12 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Collection;
+use ManukMinasyan\FilamentBlog\Enums\PostStatus;
+use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\CreatePost;
+use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\EditPost;
+use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\ListPosts;
+use ManukMinasyan\FilamentBlog\Models\Post;
 use RalphJSmit\Filament\SEO\SEO;
 
 class PostResource extends Resource
@@ -198,6 +203,48 @@ class PostResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->label('Publish')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Post $post) => $post->forceFill([
+                                'status' => PostStatus::Published,
+                                'published_at' => $post->published_at ?? now(),
+                            ])->save());
+                            Notification::make()->success()->title('Posts published')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('unpublish')
+                        ->label('Unpublish')
+                        ->icon('heroicon-o-eye-slash')
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records): void {
+                            $records->each(fn (Post $post) => $post->forceFill([
+                                'status' => PostStatus::Draft,
+                                'published_at' => null,
+                            ])->save());
+                            Notification::make()->success()->title('Posts unpublished')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('schedule')
+                        ->label('Schedule')
+                        ->icon('heroicon-o-calendar')
+                        ->schema([
+                            DateTimePicker::make('published_at')
+                                ->label('Publish at')
+                                ->required()
+                                ->minDate(now()),
+                        ])
+                        ->action(function (array $data, Collection $records): void {
+                            $records->each(fn (Post $post) => $post->forceFill([
+                                'status' => PostStatus::Published,
+                                'published_at' => $data['published_at'],
+                            ])->save());
+                            Notification::make()->success()->title('Posts scheduled')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

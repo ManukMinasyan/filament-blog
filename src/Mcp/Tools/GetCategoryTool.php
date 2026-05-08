@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ManukMinasyan\FilamentBlog\Mcp\Tools;
 
-use ManukMinasyan\FilamentBlog\Models\Category;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
+use Illuminate\JsonSchema\Types\Type;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
 use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
+use ManukMinasyan\FilamentBlog\Models\Category;
 
 #[Description('Get a single blog category by ID or slug.')]
 #[IsReadOnly]
@@ -46,7 +49,7 @@ class GetCategoryTool extends Tool
         ]);
     }
 
-    /** @return array<string, \Illuminate\JsonSchema\Types\Type> */
+    /** @return array<string, Type> */
     public function schema(JsonSchema $schema): array
     {
         return [

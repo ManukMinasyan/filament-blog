@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages;
 
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
+use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource;
 
 class EditCategory extends EditRecord
 {
