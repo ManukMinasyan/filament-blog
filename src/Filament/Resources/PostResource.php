@@ -125,6 +125,16 @@ class PostResource extends Resource
                                         TextInput::make('name')->required(),
                                     ]),
 
+                                Select::make('tags')
+                                    ->visible(fn () => (bool) config('filament-blog.features.tags', false))
+                                    ->relationship('tags', 'name')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
+                                    ->createOptionForm([
+                                        TextInput::make('name')->required(),
+                                    ]),
+
                                 Select::make('author_id')
                                     ->relationship('author', 'name')
                                     ->default(fn () => auth()->id())

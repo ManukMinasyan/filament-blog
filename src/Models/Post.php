@@ -83,6 +83,11 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function tags(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'blog_post_tag', 'post_id', 'tag_id')->withTimestamps();
+    }
+
     /** @return BelongsTo<Model, $this> */
     public function author(): BelongsTo
     {
