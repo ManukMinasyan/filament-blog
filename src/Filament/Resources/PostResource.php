@@ -8,9 +8,11 @@ use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\EditPost;
 use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\ListPosts;
 use ManukMinasyan\FilamentBlog\Models\Post;
 use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Notifications\Notification;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -198,6 +200,48 @@ class PostResource extends Resource
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    BulkAction::make('publish')
+                        ->label('Publish')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->action(function (\Illuminate\Support\Collection $records): void {
+                            $records->each(fn (Post $post) => $post->forceFill([
+                                'status' => PostStatus::Published,
+                                'published_at' => $post->published_at ?? now(),
+                            ])->save());
+                            Notification::make()->success()->title('Posts published')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('unpublish')
+                        ->label('Unpublish')
+                        ->icon('heroicon-o-eye-slash')
+                        ->requiresConfirmation()
+                        ->action(function (\Illuminate\Support\Collection $records): void {
+                            $records->each(fn (Post $post) => $post->forceFill([
+                                'status' => PostStatus::Draft,
+                                'published_at' => null,
+                            ])->save());
+                            Notification::make()->success()->title('Posts unpublished')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+                    BulkAction::make('schedule')
+                        ->label('Schedule')
+                        ->icon('heroicon-o-calendar')
+                        ->schema([
+                            DateTimePicker::make('published_at')
+                                ->label('Publish at')
+                                ->required()
+                                ->minDate(now()),
+                        ])
+                        ->action(function (array $data, \Illuminate\Support\Collection $records): void {
+                            $records->each(fn (Post $post) => $post->forceFill([
+                                'status' => PostStatus::Published,
+                                'published_at' => $data['published_at'],
+                            ])->save());
+                            Notification::make()->success()->title('Posts scheduled')->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
