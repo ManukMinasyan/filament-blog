@@ -9,6 +9,7 @@ $prefix = config('filament-blog.prefix', 'blog');
 
 Route::prefix($prefix)->middleware('web')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('blog.index');
+    Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
     Route::get('/category/{slug}', [BlogController::class, 'category'])->name('blog.category');
     Route::get('/preview/{post}', [BlogController::class, 'preview'])
         ->middleware('signed')

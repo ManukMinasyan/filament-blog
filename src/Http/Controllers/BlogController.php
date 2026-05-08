@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use ManukMinasyan\FilamentBlog\Models\Category;
 use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Tag;
 
 class BlogController extends Controller
 {
@@ -66,6 +67,26 @@ class BlogController extends Controller
     {
         return view('blog::pages.preview', [
             'post' => $post->loadMissing(['category', 'author', 'seo']),
+        ]);
+    }
+
+    public function tag(string $slug): View
+    {
+        abort_unless(config('filament-blog.features.tags', false), 404);
+
+        $tag = Tag::where('slug', $slug)->firstOrFail();
+        $perPage = (int) config('filament-blog.per_page', 12);
+
+        $posts = Post::query()
+            ->with(['category', 'author', 'seo'])
+            ->whereHas('tags', fn ($q) => $q->where('blog_tags.id', $tag->id))
+            ->published()
+            ->latest('published_at')
+            ->paginate($perPage);
+
+        return view('blog::pages.tag', [
+            'tag' => $tag,
+            'posts' => $posts,
         ]);
     }
 
