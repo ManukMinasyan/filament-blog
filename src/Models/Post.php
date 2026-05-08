@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace ManukMinasyan\FilamentBlog\Models;
 
-use ManukMinasyan\FilamentBlog\Database\Factories\PostFactory;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +15,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use ManukMinasyan\FilamentBlog\Database\Factories\PostFactory;
+use ManukMinasyan\FilamentBlog\Enums\PostStatus;
 use RalphJSmit\Laravel\SEO\Schema\ArticleSchema;
 use RalphJSmit\Laravel\SEO\Schema\BreadcrumbListSchema;
 use RalphJSmit\Laravel\SEO\SchemaCollection;

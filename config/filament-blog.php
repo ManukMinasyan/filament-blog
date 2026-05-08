@@ -1,20 +1,21 @@
 <?php
 
 declare(strict_types=1);
+use App\Models\User;
 
 return [
     'prefix' => 'blog',
 
     'layout' => 'layouts.app',
 
-    'author_model' => \App\Models\User::class,
+    'author_model' => User::class,
 
     'per_page' => 12,
 
     'features' => [
         'public_routes' => false,
-        'feed'          => false,
-        'sitemap'       => false,
+        'feed' => false,
+        'sitemap' => false,
     ],
 
     'feed' => [

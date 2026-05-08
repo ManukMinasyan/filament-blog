@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ManukMinasyan\FilamentBlog\Database\Factories;
 
-use ManukMinasyan\FilamentBlog\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use ManukMinasyan\FilamentBlog\Models\Category;
 
 /** @extends Factory<Category> */
 class CategoryFactory extends Factory

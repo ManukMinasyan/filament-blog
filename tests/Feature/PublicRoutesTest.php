@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\URL;
 use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
+use ManukMinasyan\FilamentBlog\Models\Category;
 use ManukMinasyan\FilamentBlog\Models\Post;
 
 beforeEach(function () {
@@ -29,7 +32,7 @@ test('public index route is not registered when feature disabled', function () {
     $this->refreshApplication();
     config()->set('filament-blog.features.public_routes', false);
 
-    expect(\Illuminate\Support\Facades\Route::has('blog.index'))->toBeFalse();
+    expect(Route::has('blog.index'))->toBeFalse();
 });
 
 test('public show route returns the post by slug', function () {
@@ -57,7 +60,7 @@ test('public show 404s on scheduled (future) post', function () {
 });
 
 test('public category route lists posts in that category', function () {
-    $cat = \ManukMinasyan\FilamentBlog\Models\Category::factory()->create(['name' => 'News']);
+    $cat = Category::factory()->create(['name' => 'News']);
     Post::factory()->published()->create([
         'title' => 'In category',
         'category_id' => $cat->id,
@@ -76,7 +79,7 @@ test('preview route renders draft when signature valid', function () {
         'slug' => 'draft-preview',
     ]);
 
-    $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+    $url = URL::temporarySignedRoute(
         'blog.preview', now()->addHour(), ['post' => $post->id]
     );
 

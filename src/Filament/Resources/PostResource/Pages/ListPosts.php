@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages;
 
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource;
-use ManukMinasyan\FilamentBlog\Models\Post;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource;
+use ManukMinasyan\FilamentBlog\Models\Post;
 
 class ListPosts extends ListRecords
 {

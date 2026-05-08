@@ -1,11 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace ManukMinasyan\FilamentBlog\Filament\Resources;
 
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\CreateCategory;
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\EditCategory;
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\ListCategories;
-use ManukMinasyan\FilamentBlog\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -21,6 +19,10 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\CreateCategory;
+use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\EditCategory;
+use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\ListCategories;
+use ManukMinasyan\FilamentBlog\Models\Category;
 
 class CategoryResource extends Resource
 {

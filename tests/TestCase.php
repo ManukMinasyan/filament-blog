@@ -16,6 +16,7 @@ use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Auth\User;
 use Livewire\LivewireServiceProvider;
 use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -54,7 +55,7 @@ class TestCase extends BaseTestCase
 
         $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
-        $app['config']->set('filament-blog.author_model', \Illuminate\Foundation\Auth\User::class);
+        $app['config']->set('filament-blog.author_model', User::class);
 
         $app['view']->addNamespace('tests', __DIR__.'/Fixtures/views');
     }
