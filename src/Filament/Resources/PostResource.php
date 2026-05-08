@@ -15,9 +15,11 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Field;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -145,10 +147,7 @@ class PostResource extends Resource
 
                         Section::make('Featured Image')
                             ->schema([
-                                FileUpload::make('featured_image')
-                                    ->image()
-                                    ->disk('public')
-                                    ->directory('blog'),
+                                self::featuredImageField(),
                             ]),
 
                         Section::make('SEO')
@@ -260,6 +259,30 @@ class PostResource extends Resource
                     RestoreBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+     * Returns the FileUpload component for the featured image. When the
+     * media_library feature flag is on AND spatie/laravel-medialibrary's
+     * Filament integration is installed, returns the SpatieMediaLibraryFileUpload
+     * component instead. Falls back to a plain FileUpload otherwise so the
+     * package never crashes on missing optional dependencies.
+     */
+    protected static function featuredImageField(): Field
+    {
+        $useMediaLibrary = (bool) config('filament-blog.features.media_library', false)
+            && class_exists(SpatieMediaLibraryFileUpload::class);
+
+        if ($useMediaLibrary) {
+            return SpatieMediaLibraryFileUpload::make('featured_image')
+                ->collection('featured_image')
+                ->image();
+        }
+
+        return FileUpload::make('featured_image')
+            ->image()
+            ->disk('public')
+            ->directory('blog');
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

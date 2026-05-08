@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use ManukMinasyan\FilamentBlog\Models\Category;
 use ManukMinasyan\FilamentBlog\Models\Post;
+use ManukMinasyan\FilamentBlog\Models\Tag;
 
 class BlogController extends Controller
 {
@@ -73,7 +74,7 @@ class BlogController extends Controller
     {
         abort_unless(config('filament-blog.features.tags', false), 404);
 
-        $tag = \ManukMinasyan\FilamentBlog\Models\Tag::where('slug', $slug)->firstOrFail();
+        $tag = Tag::where('slug', $slug)->firstOrFail();
         $perPage = (int) config('filament-blog.per_page', 12);
 
         $posts = Post::query()
