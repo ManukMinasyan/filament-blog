@@ -6,6 +6,7 @@ namespace ManukMinasyan\FilamentBlog\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use ManukMinasyan\FilamentBlog\Models\Category;
 use ManukMinasyan\FilamentBlog\Models\Post;
@@ -66,5 +67,21 @@ class BlogController extends Controller
         return view('blog::pages.preview', [
             'post' => $post->loadMissing(['category', 'author', 'seo']),
         ]);
+    }
+
+    public function feed(): Response
+    {
+        abort_unless(config('filament-blog.features.feed', false), 404);
+
+        $posts = Post::query()
+            ->with(['author', 'seo'])
+            ->published()
+            ->latest('published_at')
+            ->limit(20)
+            ->get();
+
+        return response()
+            ->view('blog::pages.feed', ['posts' => $posts])
+            ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }

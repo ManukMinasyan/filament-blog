@@ -90,3 +90,22 @@ test('preview route 403s without signature', function () {
 
     $this->get(route('blog.preview', $post))->assertForbidden();
 });
+
+test('feed route returns RSS XML when feed feature enabled', function () {
+    config()->set('filament-blog.features.feed', true);
+
+    Post::factory()->published()->create(['title' => 'Hello feed']);
+
+    $response = $this->get(route('blog.feed'));
+    $response->assertOk();
+    expect($response->headers->get('Content-Type'))
+        ->toStartWith('application/rss+xml');
+    expect($response->getContent())->toContain('<rss');
+    expect($response->getContent())->toContain('Hello feed');
+});
+
+test('feed route 404s when feed feature disabled', function () {
+    config()->set('filament-blog.features.feed', false);
+
+    $this->get(route('blog.feed'))->assertNotFound();
+});
