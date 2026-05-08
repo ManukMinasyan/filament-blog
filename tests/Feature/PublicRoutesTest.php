@@ -31,3 +31,62 @@ test('public index route is not registered when feature disabled', function () {
 
     expect(\Illuminate\Support\Facades\Route::has('blog.index'))->toBeFalse();
 });
+
+test('public show route returns the post by slug', function () {
+    Post::factory()->published()->create([
+        'title' => 'My Post',
+        'slug' => 'my-post',
+        'content' => 'Hello body content',
+    ]);
+
+    $this->get(route('blog.show', 'my-post'))
+        ->assertOk()
+        ->assertSeeText('My Post');
+});
+
+test('public show 404s on draft post', function () {
+    Post::factory()->draft()->create(['slug' => 'unpublished']);
+
+    $this->get(route('blog.show', 'unpublished'))->assertNotFound();
+});
+
+test('public show 404s on scheduled (future) post', function () {
+    Post::factory()->scheduled()->create(['slug' => 'tomorrow']);
+
+    $this->get(route('blog.show', 'tomorrow'))->assertNotFound();
+});
+
+test('public category route lists posts in that category', function () {
+    $cat = \ManukMinasyan\FilamentBlog\Models\Category::factory()->create(['name' => 'News']);
+    Post::factory()->published()->create([
+        'title' => 'In category',
+        'category_id' => $cat->id,
+    ]);
+    Post::factory()->published()->create(['title' => 'Out of category']);
+
+    $this->get(route('blog.category', $cat->slug))
+        ->assertOk()
+        ->assertSeeText('In category')
+        ->assertDontSeeText('Out of category');
+});
+
+test('preview route renders draft when signature valid', function () {
+    $post = Post::factory()->draft()->create([
+        'title' => 'Draft preview',
+        'slug' => 'draft-preview',
+    ]);
+
+    $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+        'blog.preview', now()->addHour(), ['post' => $post->id]
+    );
+
+    $this->get($url)
+        ->assertOk()
+        ->assertSeeText('Draft preview');
+});
+
+test('preview route 403s without signature', function () {
+    $post = Post::factory()->draft()->create();
+
+    $this->get(route('blog.preview', $post))->assertForbidden();
+});

@@ -136,6 +136,27 @@ class Post extends Model
         );
     }
 
+    public function readingTime(int $wordsPerMinute = 200): int
+    {
+        $words = str_word_count(strip_tags((string) $this->content));
+
+        return max(1, (int) ceil($words / $wordsPerMinute));
+    }
+
+    public function relatedPosts(int $limit = 3): Builder
+    {
+        return static::query()
+            ->published()
+            ->where($this->getKeyName(), '!=', $this->getKey())
+            ->when(
+                $this->category_id,
+                fn (Builder $q) => $q->where('category_id', $this->category_id),
+                fn (Builder $q) => $q->whereRaw('1 = 0'),
+            )
+            ->latest('published_at')
+            ->limit($limit);
+    }
+
     public function getUrl(): string
     {
         if ($this->status === PostStatus::Published && ! $this->published_at?->isFuture()) {
