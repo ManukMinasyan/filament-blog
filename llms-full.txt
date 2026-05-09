@@ -2,7 +2,7 @@
 
 ::u-page-hero
 #title
-A blog you can drop into any Filament app
+A drop-in blog for Filament
 
 #description
 Ships the admin, SEO components, MCP tools, and Blade components. Bring your own routes for full control — or flip a flag and get `/blog` out of the box.
