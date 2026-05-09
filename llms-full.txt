@@ -1,11 +1,11 @@
-# Filament Blog - Headless Blog Package
+# Filament Blog — Headless blog package for Filament
 
 ::u-page-hero
 #title
-Filament Blog
+A blog you can drop into any Filament app
 
 #description
-Headless-by-default blog for Filament 5 — opt into public routes, RSS feed, tags taxonomy, and MediaLibrary integration with config flags. Your app stays in control.
+Ships the admin, SEO components, MCP tools, and Blade components. Bring your own routes for full control — or flip a flag and get `/blog` out of the box.
 
 #links
   :::u-button
@@ -26,13 +26,16 @@ Headless-by-default blog for Filament 5 — opt into public routes, RSS feed, ta
   to: https://github.com/ManukMinasyan/filament-blog
   variant: outline
   ---
-  GitHub
+  Source on GitHub
   :::
 ::
 
 ::u-page-section
 #title
-Two install modes
+Two ways to install
+
+#description
+Headless by default. Opt in to the built-in routes when you want a working blog without writing controllers.
 
 #features
   :::u-page-feature
@@ -51,16 +54,46 @@ Two install modes
   icon: i-lucide-zap
   ---
   #title
-  Public-routes mode (opt-in)
+  Public-routes mode
   
   #description
-  Flip a config flag — get `/blog`, `/blog/{slug}`, `/blog/category/{slug}`, signed `/blog/preview/{post}`, and optional `/blog/feed`. No Filament panel boot needed.
+  Flip one config flag and get `/blog`, single posts, category and tag archives, signed previews, and an RSS feed. No Filament panel boot needed.
   :::
 ::
 
 ::u-page-section
 #title
-What's in the box
+Five-minute install
+
+#description
+Add the package, run migrations, register the plugin. That's the whole admin path. Public routes are one config flag away.
+
+```bash [Terminal]
+composer require manukminasyan/filament-blog
+php artisan migrate
+```
+
+```php [AppPanelProvider.php]
+use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+
+$panel->plugins([
+    FilamentBlogPlugin::make(),
+]);
+```
+
+```php [config/filament-blog.php]
+'features' => [
+    'public_routes' => true,   // /blog, /blog/{slug}, signed /blog/preview/{post}
+    'feed'          => true,   // /blog/feed (RSS 2.0)
+    'tags'          => true,   // TagResource + /blog/tag/{slug}
+    'media_library' => false,  // SpatieMediaLibraryFileUpload (optional)
+],
+```
+::
+
+::u-page-section
+#title
+What's included
 
 #features
   :::u-page-feature
@@ -68,10 +101,10 @@ What's in the box
   icon: i-lucide-layout-dashboard
   ---
   #title
-  Filament Admin Panel
+  Filament admin
   
   #description
-  PostResource and CategoryResource with markdown editor, draft/scheduled UX, SEO fields, featured images, and bulk publish/unpublish/schedule actions.
+  Posts, categories, tags. Markdown editor, draft and scheduled UX, SEO fields, bulk publish actions.
   :::
 
   :::u-page-feature
@@ -79,10 +112,10 @@ What's in the box
   icon: i-lucide-search
   ---
   #title
-  SEO Components
+  SEO baked in
   
   #description
-  Meta tags, Open Graph, Twitter Cards, JSON-LD `BlogPosting`, RSS feed, canonical URLs — all publishable Blade components.
+  Meta tags, Open Graph, Twitter Cards, JSON-LD `BlogPosting`, RSS feed, and a sitemap helper — all publishable.
   :::
 
   :::u-page-feature
@@ -90,10 +123,10 @@ What's in the box
   icon: i-lucide-bot
   ---
   #title
-  13 MCP Tools
+  MCP tools for AI
   
   #description
-  Full CRUD for posts and categories via Model Context Protocol with Sanctum ability gating and markdown sanitization (HTML stripped, unsafe links blocked).
+  13 Model Context Protocol tools so AI agents can write and publish posts. Sanctum-gated and markdown-sanitized.
   :::
 
   :::u-page-feature
@@ -101,10 +134,10 @@ What's in the box
   icon: i-lucide-hash
   ---
   #title
-  Tags taxonomy (opt-in)
+  Tags taxonomy
   
   #description
-  Many-to-many `blog_post_tag` table, `TagResource` admin UI, public archive at `/blog/tag/{slug}` — all behind a single config flag.
+  Many-to-many tags with admin UI and a public archive at `/blog/tag/{slug}`. All behind one config flag.
   :::
 
   :::u-page-feature
@@ -112,10 +145,10 @@ What's in the box
   icon: i-lucide-image
   ---
   #title
-  MediaLibrary integration (opt-in)
+  MediaLibrary ready
   
   #description
-  When the flag is on and `spatie/laravel-medialibrary` is installed, featured-image uploads use `SpatieMediaLibraryFileUpload`. Falls back gracefully if the package isn't installed.
+  Featured-image uploads switch to `SpatieMediaLibraryFileUpload` when you install the package and flip the flag.
   :::
 
   :::u-page-feature
@@ -123,33 +156,24 @@ What's in the box
   icon: i-lucide-paintbrush
   ---
   #title
-  Publishable UI Components
+  Tailwind components
   
   #description
-  Post-card, post-header, post-body, related-posts, and more — Tailwind + dark mode out of the box. Publish to fully customize.
+  Post card, header, body, related posts, preview banner. Dark mode out of the box. Publish and customize.
   :::
+::
 
-  :::u-page-feature
-  ---
-  icon: i-lucide-map
-  ---
-  #title
-  Sitemap Generator
-  
-  #description
-  Route-aware sitemap helper that automatically adds blog index, categories, tags, and individual posts.
-  :::
+::u-page-section
+#title
+Built for teams replacing internal blogs
 
-  :::u-page-feature
-  ---
-  icon: i-lucide-clock
-  ---
-  #title
-  Reading time + related posts
-  
-  #description
-  `Post::readingTime()` and `Post::relatedPosts()` helpers ship with the model. No extra queries to wire.
-  :::
+#description
+The schema and admin shape match what Tapix and FilaForms ship internally — so swapping in is a `composer remove` away. No data migration, no template rewrites unless you want them.
+
+```bash [Terminal]
+composer remove tapix/blog        # or filaforms/blog
+composer require manukminasyan/filament-blog
+```
 ::
 
 
