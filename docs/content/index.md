@@ -36,67 +36,6 @@ Ships the admin, SEO components, MCP tools, and Blade components. Bring your own
 
 ::u-page-section
 #title
-Two ways to install
-
-#description
-Headless by default. Opt in to the built-in routes when you want a working blog without writing controllers.
-
-#features
-  :::u-page-feature
-  ---
-  icon: i-lucide-route-off
-  ---
-  #title
-  Headless (default)
-  
-  #description
-  No routes, no controllers, no forced views. Use the Blade components, write your own routing. Your app owns the frontend.
-  :::
-
-  :::u-page-feature
-  ---
-  icon: i-lucide-zap
-  ---
-  #title
-  Public-routes mode
-  
-  #description
-  Flip one config flag and get `/blog`, single posts, category and tag archives, signed previews, and an RSS feed. No Filament panel boot needed.
-  :::
-::
-
-::u-page-section
-#title
-Five-minute install
-
-#description
-Add the package, run migrations, register the plugin. That's the whole admin path. Public routes are one config flag away.
-
-```bash [Terminal]
-composer require manukminasyan/filament-blog
-php artisan migrate
-```
-
-```php [AppPanelProvider.php]
-use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
-
-$panel->plugins([
-    FilamentBlogPlugin::make(),
-]);
-```
-
-```php [config/filament-blog.php]
-'features' => [
-    'public_routes' => true,   // /blog, /blog/{slug}, signed /blog/preview/{post}
-    'feed'          => true,   // /blog/feed (RSS 2.0)
-    'tags'          => true,   // TagResource + /blog/tag/{slug}
-    'media_library' => false,  // SpatieMediaLibraryFileUpload (optional)
-],
-```
-::
-
-::u-page-section
-#title
 What's included
 
 #features
@@ -165,17 +104,4 @@ What's included
   #description
   Post card, header, body, related posts, preview banner. Dark mode out of the box. Publish and customize.
   :::
-::
-
-::u-page-section
-#title
-Built for teams replacing internal blogs
-
-#description
-The schema and admin shape match what Tapix and FilaForms ship internally — so swapping in is a `composer remove` away. No data migration, no template rewrites unless you want them.
-
-```bash [Terminal]
-composer remove tapix/blog        # or filaforms/blog
-composer require manukminasyan/filament-blog
-```
 ::
