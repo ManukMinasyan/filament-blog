@@ -27,7 +27,7 @@ Ships the admin, SEO components, MCP tools, and Blade components. Bring your own
   color: neutral
   icon: simple-icons:github
   size: xl
-  to: https://github.com/ManukMinasyan/filament-blog
+  to: https://github.com/relaticle/ink
   variant: outline
   ---
   Source on GitHub

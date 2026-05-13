@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Database\Factories;
+namespace Relaticle\Ink\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Str;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Enums\PostStatus;
+use Relaticle\Ink\Models\Post;
 
 /** @extends Factory<Post> */
 class PostFactory extends Factory
@@ -62,7 +62,7 @@ class PostFactory extends Factory
      */
     protected function resolveAuthorId(): int|string
     {
-        $authorModel = (string) config('filament-blog.author_model', User::class);
+        $authorModel = (string) config('ink.author_model', User::class);
 
         if (class_exists($authorModel) && method_exists($authorModel, 'factory')) {
             return $authorModel::factory()->create()->getKey();

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog;
+namespace Relaticle\Ink;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
-class FilamentBlogPlugin implements Plugin
+class InkPlugin implements Plugin
 {
     public static function make(): static
     {
@@ -24,14 +24,14 @@ class FilamentBlogPlugin implements Plugin
 
     public function getId(): string
     {
-        return 'filament-blog';
+        return 'ink';
     }
 
     public function register(Panel $panel): void
     {
         $panel->discoverResources(
             in: __DIR__.'/Filament/Resources',
-            for: 'ManukMinasyan\\FilamentBlog\\Filament\\Resources',
+            for: 'Relaticle\\Ink\\Filament\\Resources',
         );
     }
 

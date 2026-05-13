@@ -8,7 +8,7 @@ export default defineAppConfig({
         description: 'Headless blog package for Filament with SEO, MCP tools, and publishable components.',
     },
     github: {
-        repo: 'filament-blog',
+        repo: 'ink',
         owner: 'ManukMinasyan',
         edit: true,
         rootDir: 'docs'
@@ -23,7 +23,7 @@ export default defineAppConfig({
         title: 'On this page',
         bottom: {
             title: 'Ecosystem',
-            edit: 'https://github.com/ManukMinasyan/filament-blog',
+            edit: 'https://github.com/relaticle/ink',
             links: [
                 {
                     icon: 'i-simple-icons-laravel',

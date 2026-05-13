@@ -1,6 +1,12 @@
 {
-    "name": "manukminasyan/filament-blog",
-    "description": "Headless blog package for Filament with SEO, MCP tools, and publishable components.",
+    "name": "relaticle/ink",
+    "description": "Filament-native content publishing for blog, docs, and AI-citable articles. Headless by default, with opt-in public routes.",
+    "keywords": ["laravel","filament","blog","cms","headless","mcp","seo","markdown","ink","content"],
+    "homepage": "https://github.com/relaticle/ink",
+    "support": {
+        "issues": "https://github.com/relaticle/ink/issues",
+        "source": "https://github.com/relaticle/ink"
+    },
     "license": "MIT",
     "require": {
         "php": "^8.4",
@@ -15,19 +21,19 @@
     },
     "autoload": {
         "psr-4": {
-            "ManukMinasyan\\FilamentBlog\\": "src/",
-            "ManukMinasyan\\FilamentBlog\\Database\\Factories\\": "database/factories/"
+            "Relaticle\\Ink\\": "src/",
+            "Relaticle\\Ink\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ManukMinasyan\\FilamentBlog\\Tests\\": "tests/"
+            "Relaticle\\Ink\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ManukMinasyan\\FilamentBlog\\FilamentBlogServiceProvider"
+                "Relaticle\\Ink\\InkServiceProvider"
             ]
         }
     },

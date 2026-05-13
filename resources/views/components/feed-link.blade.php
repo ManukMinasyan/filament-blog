@@ -1,3 +1,3 @@
 <link rel="alternate" type="application/rss+xml"
-      title="{{ config('filament-blog.feed.title', config('app.name') . ' Blog') }}"
+      title="{{ config('ink.feed.title', config('app.name') . ' Blog') }}"
       href="{{ route('blog.feed') }}" />

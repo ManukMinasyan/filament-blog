@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages;
+namespace Relaticle\Ink\Filament\Resources\PostResource\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
 use Illuminate\Database\Eloquent\Builder;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Filament\Resources\PostResource;
+use Relaticle\Ink\Models\Post;
 
 class ListPosts extends ListRecords
 {

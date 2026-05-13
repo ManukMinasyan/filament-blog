@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Components;
+namespace Relaticle\Ink\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Post;
 
 class Feed extends Component
 {
@@ -18,6 +18,6 @@ class Feed extends Component
 
     public function render(): View
     {
-        return view('blog::components.feed');
+        return view('ink::components.feed');
     }
 }

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog;
+namespace Relaticle\Ink;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Route;
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 

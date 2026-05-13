@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages;
+namespace Relaticle\Ink\Filament\Resources\CategoryResource\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource;
+use Relaticle\Ink\Filament\Resources\CategoryResource;
 
 class ListCategories extends ListRecords
 {

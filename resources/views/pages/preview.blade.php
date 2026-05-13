@@ -1,4 +1,4 @@
-@extends(config('filament-blog.layout', 'layouts.app'))
+@extends(config('ink.layout', 'layouts.app'))
 
 @section('content')
 <meta name="robots" content="noindex, nofollow">

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Mcp\Tools;
+namespace Relaticle\Ink\Mcp\Tools;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
@@ -12,8 +12,8 @@ use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Enums\PostStatus;
+use Relaticle\Ink\Models\Post;
 
 #[Description('List blog posts with optional filters for status, category, and search term.')]
 #[IsReadOnly]

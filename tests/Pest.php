@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use ManukMinasyan\FilamentBlog\Tests\TestCase;
 use Orchestra\Testbench\Factories\UserFactory;
+use Relaticle\Ink\Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)

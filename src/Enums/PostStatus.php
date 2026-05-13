@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Enums;
+namespace Relaticle\Ink\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 

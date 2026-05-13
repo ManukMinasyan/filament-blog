@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make `manukminasyan/filament-blog` a drop-in replacement for the Tapix and FilaForms internal blog packages by adding opt-in public routes (controller + page views), bulk publishing actions, MCP markdown sanitization, reading-time / related-posts wiring, plus a real test suite and CI.
+**Goal:** Make `relaticle/ink` a drop-in replacement for the Tapix and FilaForms internal blog packages by adding opt-in public routes (controller + page views), bulk publishing actions, MCP markdown sanitization, reading-time / related-posts wiring, plus a real test suite and CI.
 
-**Architecture:** Feature flags live in `config/filament-blog.php` (not on the Filament plugin) so public routes register at the service-provider level — independently of any Filament panel boot. Headless behavior remains the default (`features.public_routes = false` would mean exactly today's behavior). Filament panel concerns stay on the plugin (resource discovery, MCP tool registration). Two-layer architecture: Core (always on) + Plus (opt-in via config).
+**Architecture:** Feature flags live in `config/ink.php` (not on the Filament plugin) so public routes register at the service-provider level — independently of any Filament panel boot. Headless behavior remains the default (`features.public_routes = false` would mean exactly today's behavior). Filament panel concerns stay on the plugin (resource discovery, MCP tool registration). Two-layer architecture: Core (always on) + Plus (opt-in via config).
 
 **Tech Stack:** PHP 8.3+ · Laravel 12 · Filament v5 · Pest v3 · Spatie Laravel Package Tools · Spatie Sluggable · Ralph J Smit Laravel SEO · Spatie Markdown.
 
@@ -21,7 +21,7 @@
 - `resources/views/pages/show.blade.php`
 - `resources/views/pages/category.blade.php`
 - `resources/views/pages/preview.blade.php`
-- `resources/views/pages/feed.blade.php` — RSS 2.0 page (re-uses existing `<x-blog::feed>` component)
+- `resources/views/pages/feed.blade.php` — RSS 2.0 page (re-uses existing `<x-ink::feed>` component)
 - `resources/views/pages/_post-content.blade.php` — shared partial used by show + preview
 - `tests/TestCase.php` — Orchestra Testbench base
 - `tests/Pest.php` — pest bootstrap
@@ -34,8 +34,8 @@
 - `.github/workflows/tests.yml`
 
 **Modified:**
-- `config/filament-blog.php` — add `features` array, `layout`, `tables` sections, fill default `feed` metadata
-- `src/FilamentBlogServiceProvider.php` — read config flags, conditionally register routes
+- `config/ink.php` — add `features` array, `layout`, `tables` sections, fill default `feed` metadata
+- `src/InkServiceProvider.php` — read config flags, conditionally register routes
 - `src/Filament/Resources/PostResource.php` — add bulk publish/unpublish/schedule actions
 - `src/Mcp/Tools/CreatePostTool.php` — markdown sanitization
 - `src/Mcp/Tools/UpdatePostTool.php` — markdown sanitization
@@ -103,7 +103,7 @@ Expected: `composer.json` gets a `require-dev` block; `composer.lock` updated; v
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Tests;
+namespace Relaticle\Ink\Tests;
 
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
@@ -118,7 +118,7 @@ use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Livewire\LivewireServiceProvider;
-use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
+use Relaticle\Ink\InkServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use RalphJSmit\Laravel\SEO\SEOServiceProvider as RalphSEOServiceProvider;
 use Spatie\Sluggable\HasSlug;
@@ -142,7 +142,7 @@ class TestCase extends BaseTestCase
             WidgetsServiceProvider::class,
             LivewireServiceProvider::class,
             RalphSEOServiceProvider::class,
-            FilamentBlogServiceProvider::class,
+            InkServiceProvider::class,
         ];
     }
 
@@ -183,7 +183,7 @@ class TestCase extends BaseTestCase
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use ManukMinasyan\FilamentBlog\Tests\TestCase;
+use Relaticle\Ink\Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
@@ -331,11 +331,11 @@ git commit -m "ci: add tests + lint workflow"
 ### Task 3: Add `features`, `layout`, `tables` to config
 
 **Files:**
-- Modify: `config/filament-blog.php` (full rewrite — short file)
+- Modify: `config/ink.php` (full rewrite — short file)
 
 - [ ] **Step 1: Replace the config file**
 
-Replace `config/filament-blog.php` contents with:
+Replace `config/ink.php` contents with:
 
 ```php
 <?php
@@ -381,7 +381,7 @@ Note: defaults are `false` so existing installs keep their headless behavior unc
 - [ ] **Step 2: Commit**
 
 ```bash
-git add config/filament-blog.php
+git add config/ink.php
 git commit -m "feat(config): add features array, layout, tables sections"
 ```
 
@@ -401,12 +401,12 @@ git commit -m "feat(config): add features array, layout, tables sections"
 
 declare(strict_types=1);
 
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
 
 beforeEach(function () {
-    config()->set('filament-blog.features.public_routes', true);
-    config()->set('filament-blog.layout', 'tests::layouts.empty');
+    config()->set('ink.features.public_routes', true);
+    config()->set('ink.layout', 'tests::layouts.empty');
 });
 
 test('public index route returns published posts when feature enabled', function () {
@@ -418,7 +418,7 @@ test('public index route returns published posts when feature enabled', function
 });
 
 test('public index route is not registered when feature disabled', function () {
-    config()->set('filament-blog.features.public_routes', false);
+    config()->set('ink.features.public_routes', false);
 
     expect(\Illuminate\Support\Facades\Route::has('blog.index'))->toBeFalse();
 });
@@ -449,10 +449,10 @@ Expected: FAIL — `route('blog.index')` not defined; route helper throws.
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Database\Factories;
+namespace Relaticle\Ink\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use ManukMinasyan\FilamentBlog\Models\Category;
+use Relaticle\Ink\Models\Category;
 
 class CategoryFactory extends Factory
 {
@@ -477,12 +477,12 @@ class CategoryFactory extends Factory
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Database\Factories;
+namespace Relaticle\Ink\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Enums\PostStatus;
+use Relaticle\Ink\Models\Post;
 
 class PostFactory extends Factory
 {
@@ -530,8 +530,8 @@ In `composer.json`, ensure the factories namespace is autoloaded — add this `a
 ```json
 "autoload-dev": {
     "psr-4": {
-        "ManukMinasyan\\FilamentBlog\\Tests\\": "tests/",
-        "ManukMinasyan\\FilamentBlog\\Database\\Factories\\": "database/factories/"
+        "Relaticle\\Ink\\Tests\\": "tests/",
+        "Relaticle\\Ink\\Database\\Factories\\": "database/factories/"
     }
 }
 ```
@@ -547,18 +547,18 @@ composer dump-autoload
 In `src/Models/Post.php`, ensure `use HasFactory;` is present and add the static `newFactory()` if HasFactory cannot resolve namespace:
 
 ```php
-protected static function newFactory(): \ManukMinasyan\FilamentBlog\Database\Factories\PostFactory
+protected static function newFactory(): \Relaticle\Ink\Database\Factories\PostFactory
 {
-    return \ManukMinasyan\FilamentBlog\Database\Factories\PostFactory::new();
+    return \Relaticle\Ink\Database\Factories\PostFactory::new();
 }
 ```
 
 Same for `Category.php`:
 
 ```php
-protected static function newFactory(): \ManukMinasyan\FilamentBlog\Database\Factories\CategoryFactory
+protected static function newFactory(): \Relaticle\Ink\Database\Factories\CategoryFactory
 {
-    return \ManukMinasyan\FilamentBlog\Database\Factories\CategoryFactory::new();
+    return \Relaticle\Ink\Database\Factories\CategoryFactory::new();
 }
 ```
 
@@ -606,18 +606,18 @@ git commit -m "test: add Post + Category factories and fixture layout"
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Http\Controllers;
+namespace Relaticle\Ink\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Post;
 
 class BlogController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = (int) config('filament-blog.per_page', 12);
+        $perPage = (int) config('ink.per_page', 12);
 
         $posts = Post::query()
             ->with(['category', 'author', 'seo'])
@@ -625,7 +625,7 @@ class BlogController extends Controller
             ->latest('published_at')
             ->paginate($perPage);
 
-        return view('blog::pages.index', [
+        return view('ink::pages.index', [
             'posts' => $posts,
         ]);
     }
@@ -642,9 +642,9 @@ class BlogController extends Controller
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use ManukMinasyan\FilamentBlog\Http\Controllers\BlogController;
+use Relaticle\Ink\Http\Controllers\BlogController;
 
-$prefix = config('filament-blog.prefix', 'blog');
+$prefix = config('ink.prefix', 'ink');
 
 Route::prefix($prefix)->middleware('web')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('blog.index');
@@ -653,14 +653,14 @@ Route::prefix($prefix)->middleware('web')->group(function () {
 
 - [ ] **Step 3: Wire route loading in service provider**
 
-In `src/FilamentBlogServiceProvider.php`, replace `packageBooted()` with:
+In `src/InkServiceProvider.php`, replace `packageBooted()` with:
 
 ```php
 public function packageBooted(): void
 {
-    Blade::componentNamespace('ManukMinasyan\\FilamentBlog\\Components', 'blog');
+    Blade::componentNamespace('Relaticle\\Ink\\Components', 'ink');
 
-    if (config('filament-blog.features.public_routes')) {
+    if (config('ink.features.public_routes')) {
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
     }
 }
@@ -671,15 +671,15 @@ public function packageBooted(): void
 `resources/views/pages/index.blade.php`:
 
 ```blade
-@extends(config('filament-blog.layout', 'layouts.app'))
+@extends(config('ink.layout', 'layouts.app'))
 
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold mb-8">{{ config('filament-blog.feed.title') ?? 'Blog' }}</h1>
+    <h1 class="text-3xl font-bold mb-8">{{ config('ink.feed.title') ?? 'Blog' }}</h1>
 
     <div class="space-y-8">
         @forelse ($posts as $post)
-            <x-blog::post-card :post="$post" />
+            <x-ink::post-card :post="$post" />
         @empty
             <p class="text-gray-500">No posts yet.</p>
         @endforelse
@@ -703,7 +703,7 @@ Expected: PASS for "public index route returns published posts when feature enab
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/Http/Controllers/BlogController.php routes/web.php src/FilamentBlogServiceProvider.php resources/views/pages/index.blade.php
+git add src/Http/Controllers/BlogController.php routes/web.php src/InkServiceProvider.php resources/views/pages/index.blade.php
 git commit -m "feat: add public blog routes and index page (config-gated)"
 ```
 
@@ -772,7 +772,7 @@ public function show(string $slug): View
 
     $related = $post->relatedPosts(limit: 3)->get();
 
-    return view('blog::pages.show', [
+    return view('ink::pages.show', [
         'post' => $post,
         'relatedPosts' => $related,
     ]);
@@ -796,15 +796,15 @@ Route::get('/{slug}', [BlogController::class, 'show'])->name('blog.show');
 `resources/views/pages/show.blade.php`:
 
 ```blade
-@extends(config('filament-blog.layout', 'layouts.app'))
+@extends(config('ink.layout', 'layouts.app'))
 
 @section('content')
 <article class="max-w-2xl mx-auto px-4 py-12 prose dark:prose-invert">
-    <x-blog::post-header :post="$post" />
+    <x-ink::post-header :post="$post" />
 
     @include('blog::pages._post-content', ['post' => $post])
 
-    <x-blog::related-posts :post="$post" :relatedPosts="$relatedPosts" />
+    <x-ink::related-posts :post="$post" :relatedPosts="$relatedPosts" />
 </article>
 @endsection
 ```
@@ -815,7 +815,7 @@ Route::get('/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 ```blade
 <div class="post-body">
-    <x-blog::post-body :post="$post" />
+    <x-ink::post-body :post="$post" />
 </div>
 ```
 
@@ -879,8 +879,8 @@ In `BlogController`, add:
 ```php
 public function category(string $slug): View
 {
-    $category = \ManukMinasyan\FilamentBlog\Models\Category::where('slug', $slug)->firstOrFail();
-    $perPage = (int) config('filament-blog.per_page', 12);
+    $category = \Relaticle\Ink\Models\Category::where('slug', $slug)->firstOrFail();
+    $perPage = (int) config('ink.per_page', 12);
 
     $posts = Post::query()
         ->with(['category', 'author', 'seo'])
@@ -889,7 +889,7 @@ public function category(string $slug): View
         ->latest('published_at')
         ->paginate($perPage);
 
-    return view('blog::pages.category', [
+    return view('ink::pages.category', [
         'category' => $category,
         'posts' => $posts,
     ]);
@@ -913,16 +913,16 @@ Route::prefix($prefix)->middleware('web')->group(function () {
 `resources/views/pages/category.blade.php`:
 
 ```blade
-@extends(config('filament-blog.layout', 'layouts.app'))
+@extends(config('ink.layout', 'layouts.app'))
 
 @section('content')
 <div class="max-w-3xl mx-auto px-4 py-12">
     <h1 class="text-3xl font-bold mb-2">{{ $category->name }}</h1>
-    <p class="text-gray-500 mb-8">Posts filed under <x-blog::category-badge :category="$category" /></p>
+    <p class="text-gray-500 mb-8">Posts filed under <x-ink::category-badge :category="$category" /></p>
 
     <div class="space-y-8">
         @forelse ($posts as $post)
-            <x-blog::post-card :post="$post" />
+            <x-ink::post-card :post="$post" />
         @empty
             <p class="text-gray-500">No posts in this category yet.</p>
         @endforelse
@@ -989,9 +989,9 @@ test('preview route 403s without signature', function () {
 - [ ] **Step 2: Add controller action**
 
 ```php
-public function preview(\ManukMinasyan\FilamentBlog\Models\Post $post): View
+public function preview(\Relaticle\Ink\Models\Post $post): View
 {
-    return view('blog::pages.preview', [
+    return view('ink::pages.preview', [
         'post' => $post->loadMissing(['category', 'author', 'seo']),
     ]);
 }
@@ -1012,18 +1012,18 @@ Route::get('/preview/{post}', [BlogController::class, 'preview'])
 `resources/views/pages/preview.blade.php`:
 
 ```blade
-@extends(config('filament-blog.layout', 'layouts.app'))
+@extends(config('ink.layout', 'layouts.app'))
 
 @section('content')
 <article class="max-w-2xl mx-auto px-4 py-12 prose dark:prose-invert">
-    <x-blog::preview-banner />
-    <x-blog::post-header :post="$post" />
+    <x-ink::preview-banner />
+    <x-ink::post-header :post="$post" />
     @include('blog::pages._post-content', ['post' => $post])
 </article>
 @endsection
 ```
 
-The existing `<x-blog::preview-banner>` component should already push a `noindex,nofollow` meta tag — confirm with:
+The existing `<x-ink::preview-banner>` component should already push a `noindex,nofollow` meta tag — confirm with:
 
 ```bash
 grep -n "noindex" /tmp/filament-blog/src/Components/PreviewBanner.php /tmp/filament-blog/resources/views/components/preview-banner.blade.php 2>&1
@@ -1054,7 +1054,7 @@ git commit -m "feat: add signed preview route for drafts"
 - Modify: `tests/Feature/PublicRoutesTest.php`
 - Modify: `src/Http/Controllers/BlogController.php`
 - Modify: `routes/web.php`
-- Modify: `src/FilamentBlogServiceProvider.php`
+- Modify: `src/InkServiceProvider.php`
 - Create: `resources/views/pages/feed.blade.php`
 
 - [ ] **Step 1: Failing tests**
@@ -1063,7 +1063,7 @@ Append:
 
 ```php
 test('feed route returns RSS XML when feed feature enabled', function () {
-    config()->set('filament-blog.features.feed', true);
+    config()->set('ink.features.feed', true);
 
     $post = Post::factory()->published()->create(['title' => 'Hello feed']);
 
@@ -1075,7 +1075,7 @@ test('feed route returns RSS XML when feed feature enabled', function () {
 });
 
 test('feed route is not registered when feed feature disabled', function () {
-    config()->set('filament-blog.features.feed', false);
+    config()->set('ink.features.feed', false);
 
     expect(\Illuminate\Support\Facades\Route::has('blog.feed'))->toBeFalse();
 });
@@ -1102,7 +1102,7 @@ public function feed(): \Illuminate\Http\Response
         ->get();
 
     return response()
-        ->view('blog::pages.feed', ['posts' => $posts])
+        ->view('ink::pages.feed', ['posts' => $posts])
         ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
 }
 ```
@@ -1117,9 +1117,9 @@ In `routes/web.php`, conditionally register the feed:
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use ManukMinasyan\FilamentBlog\Http\Controllers\BlogController;
+use Relaticle\Ink\Http\Controllers\BlogController;
 
-$prefix = config('filament-blog.prefix', 'blog');
+$prefix = config('ink.prefix', 'ink');
 
 Route::prefix($prefix)->middleware('web')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('blog.index');
@@ -1128,7 +1128,7 @@ Route::prefix($prefix)->middleware('web')->group(function () {
         ->middleware('signed')
         ->name('blog.preview');
 
-    if (config('filament-blog.features.feed')) {
+    if (config('ink.features.feed')) {
         Route::get('/feed', [BlogController::class, 'feed'])->name('blog.feed');
     }
 
@@ -1144,9 +1144,9 @@ Route::prefix($prefix)->middleware('web')->group(function () {
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-    <title>{{ config('filament-blog.feed.title') ?? config('app.name') }}</title>
+    <title>{{ config('ink.feed.title') ?? config('app.name') }}</title>
     <link>{{ url('/') }}</link>
-    <description>{{ config('filament-blog.feed.description') ?? '' }}</description>
+    <description>{{ config('ink.feed.description') ?? '' }}</description>
     <language>en</language>
     <atom:link href="{{ route('blog.feed') }}" rel="self" type="application/rss+xml" />
     @foreach ($posts as $post)
@@ -1156,8 +1156,8 @@ Route::prefix($prefix)->middleware('web')->group(function () {
             <guid isPermaLink="true">{{ \Illuminate\Support\Facades\Route::has('blog.show') ? route('blog.show', $post->slug) : url('/blog/'.$post->slug) }}</guid>
             <pubDate>{{ $post->published_at?->toRfc822String() }}</pubDate>
             <description><![CDATA[{{ $post->excerpt }}]]></description>
-            @if (config('filament-blog.feed.author_email'))
-                <author>{{ config('filament-blog.feed.author_email') }}</author>
+            @if (config('ink.feed.author_email'))
+                <author>{{ config('ink.feed.author_email') }}</author>
             @endif
         </item>
     @endforeach
@@ -1198,9 +1198,9 @@ git commit -m "feat: add RSS feed route gated by features.feed"
 declare(strict_types=1);
 
 use Filament\Actions\Testing\TestAction;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\ListPosts;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Enums\PostStatus;
+use Relaticle\Ink\Filament\Resources\PostResource\Pages\ListPosts;
+use Relaticle\Ink\Models\Post;
 use function Pest\Livewire\livewire;
 
 beforeEach(function () {
@@ -1352,8 +1352,8 @@ git commit -m "feat(admin): add bulk publish/unpublish/schedule actions"
 declare(strict_types=1);
 
 use Laravel\Mcp\Server\Request;
-use ManukMinasyan\FilamentBlog\Mcp\Tools\CreatePostTool;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Mcp\Tools\CreatePostTool;
+use Relaticle\Ink\Models\Post;
 
 test('CreatePostTool strips HTML and unsafe links from content', function () {
     $user = (object) ['is_admin' => true];
@@ -1445,7 +1445,7 @@ git commit -m "fix(mcp): sanitize markdown in Create/UpdatePostTool (strip HTML,
 
 declare(strict_types=1);
 
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Post;
 
 test('readingTime computes minutes from content word count', function () {
     $post = Post::factory()->create([
@@ -1512,7 +1512,7 @@ Append to `tests/Feature/PostModelTest.php`:
 
 ```php
 test('relatedPosts returns same-category published posts excluding self', function () {
-    $cat = \ManukMinasyan\FilamentBlog\Models\Category::factory()->create();
+    $cat = \Relaticle\Ink\Models\Category::factory()->create();
     $self = Post::factory()->published()->create(['category_id' => $cat->id]);
     $a = Post::factory()->published()->create(['category_id' => $cat->id]);
     $b = Post::factory()->published()->create(['category_id' => $cat->id]);
@@ -1617,7 +1617,7 @@ To get a working blog at `/blog` without writing any controllers, flip the
 feature flag:
 
 ```php
-// config/filament-blog.php
+// config/ink.php
 'features' => [
     'public_routes' => true,   // /blog, /blog/{slug}, /blog/category/{slug}, /blog/preview/{post}
     'feed'          => true,   // adds /blog/feed (RSS 2.0)
@@ -1633,7 +1633,7 @@ admin.
 Publish the views if you want to customize them:
 
 ```bash
-php artisan vendor:publish --tag=filament-blog-views
+php artisan vendor:publish --tag=ink-views
 ```
 ```
 
@@ -1704,18 +1704,18 @@ git push -u origin feat/public-routes-phase-1
 gh pr create --base main --title "feat: opt-in public routes (drop-in for Tapix/FilaForms blog) [Phase 1]" --body "$(cat <<'EOF'
 ## Summary
 
-Phase 1 of the strategy laid out in `.context/blog-package-comparison.md` (in the demo workspace). Makes `manukminasyan/filament-blog` a drop-in replacement for the Tapix and FilaForms internal blog packages while keeping the headless-by-default behavior intact.
+Phase 1 of the strategy laid out in `.context/blog-package-comparison.md` (in the demo workspace). Makes `relaticle/ink` a drop-in replacement for the Tapix and FilaForms internal blog packages while keeping the headless-by-default behavior intact.
 
 ## What's new
 
-- **Public routes mode** (opt-in via `config('filament-blog.features.public_routes') = true`)
+- **Public routes mode** (opt-in via `config('ink.features.public_routes') = true`)
   - `BlogController` + `routes/web.php` registering `blog.index`, `blog.show`, `blog.category`, `blog.preview` (signed)
   - Service provider loads routes at boot — no Filament panel needed
 - **RSS feed** (opt-in via `features.feed`) — `/blog/feed` returns RSS 2.0
 - **Layout config** (`'layout' => 'layouts.app'`) for the page views to extend
 - **Bulk publish/unpublish/schedule actions** in `PostResource`
 - **MCP markdown sanitization** — `CreatePostTool` and `UpdatePostTool` now strip HTML and disallow unsafe links
-- **`Post::readingTime()`** accessor and **`Post::relatedPosts()`** query, with `<x-blog::related-posts>` wired to use them
+- **`Post::readingTime()`** accessor and **`Post::relatedPosts()`** query, with `<x-ink::related-posts>` wired to use them
 - **Test infrastructure** — Pest 3 + Orchestra Testbench, Pint config, GitHub Actions workflow
 - **README / docs** updated with the new mode
 

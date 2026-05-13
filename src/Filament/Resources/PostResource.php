@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources;
+namespace Relaticle\Ink\Filament\Resources;
 
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -35,12 +35,12 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Collection;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\CreatePost;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\EditPost;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages\ListPosts;
-use ManukMinasyan\FilamentBlog\Models\Post;
 use RalphJSmit\Filament\SEO\SEO;
+use Relaticle\Ink\Enums\PostStatus;
+use Relaticle\Ink\Filament\Resources\PostResource\Pages\CreatePost;
+use Relaticle\Ink\Filament\Resources\PostResource\Pages\EditPost;
+use Relaticle\Ink\Filament\Resources\PostResource\Pages\ListPosts;
+use Relaticle\Ink\Models\Post;
 
 class PostResource extends Resource
 {
@@ -128,7 +128,7 @@ class PostResource extends Resource
                                     ]),
 
                                 Select::make('tags')
-                                    ->visible(fn () => (bool) config('filament-blog.features.tags', false))
+                                    ->visible(fn () => (bool) config('ink.features.tags', false))
                                     ->relationship('tags', 'name')
                                     ->multiple()
                                     ->searchable()
@@ -270,7 +270,7 @@ class PostResource extends Resource
      */
     protected static function featuredImageField(): Field
     {
-        $useMediaLibrary = (bool) config('filament-blog.features.media_library', false)
+        $useMediaLibrary = (bool) config('ink.features.media_library', false)
             && class_exists(SpatieMediaLibraryFileUpload::class);
 
         if ($useMediaLibrary) {
@@ -282,7 +282,7 @@ class PostResource extends Resource
         return FileUpload::make('featured_image')
             ->image()
             ->disk('public')
-            ->directory('blog');
+            ->directory('ink');
     }
 
     public static function getRecordRouteBindingEloquentQuery(): Builder

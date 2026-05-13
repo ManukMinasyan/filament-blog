@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Tests;
+namespace Relaticle\Ink\Tests;
 
 use BladeUI\Heroicons\BladeHeroiconsServiceProvider;
 use BladeUI\Icons\BladeIconsServiceProvider;
@@ -18,9 +18,9 @@ use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Auth\User;
 use Livewire\LivewireServiceProvider;
-use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use RalphJSmit\Laravel\SEO\LaravelSEOServiceProvider as RalphSEOServiceProvider;
+use Relaticle\Ink\InkServiceProvider;
 
 class TestCase extends BaseTestCase
 {
@@ -40,7 +40,7 @@ class TestCase extends BaseTestCase
             WidgetsServiceProvider::class,
             LivewireServiceProvider::class,
             RalphSEOServiceProvider::class,
-            FilamentBlogServiceProvider::class,
+            InkServiceProvider::class,
         ];
     }
 
@@ -56,7 +56,7 @@ class TestCase extends BaseTestCase
 
         $app['config']->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
 
-        $app['config']->set('filament-blog.author_model', User::class);
+        $app['config']->set('ink.author_model', User::class);
 
         $app['view']->addNamespace('tests', __DIR__.'/Fixtures/views');
     }

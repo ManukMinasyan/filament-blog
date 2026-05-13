@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use ManukMinasyan\FilamentBlog\Http\Controllers\BlogController;
+use Relaticle\Ink\Http\Controllers\BlogController;
 
-$prefix = config('filament-blog.prefix', 'blog');
+$prefix = config('ink.prefix', 'ink');
 
 Route::prefix($prefix)->middleware('web')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('blog.index');

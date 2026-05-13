@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Filament\Forms\Components\FileUpload;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource;
-use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
-use ManukMinasyan\FilamentBlog\Models\Post;
-use ManukMinasyan\FilamentBlog\Models\Tag;
+use Relaticle\Ink\Filament\Resources\PostResource;
+use Relaticle\Ink\InkServiceProvider;
+use Relaticle\Ink\Models\Post;
+use Relaticle\Ink\Models\Tag;
 
 test('a post can have many tags', function () {
     $post = Post::factory()->published()->create();
@@ -57,11 +57,11 @@ test('deleting a post cascades pivot rows', function () {
 });
 
 test('tag archive route 404s when tags feature disabled', function () {
-    config()->set('filament-blog.features.tags', false);
-    config()->set('filament-blog.features.public_routes', true);
-    config()->set('filament-blog.layout', 'tests::layouts.empty');
-    $this->app->register(FilamentBlogServiceProvider::class, force: true);
-    $this->app->getProvider(FilamentBlogServiceProvider::class)->packageBooted();
+    config()->set('ink.features.tags', false);
+    config()->set('ink.features.public_routes', true);
+    config()->set('ink.layout', 'tests::layouts.empty');
+    $this->app->register(InkServiceProvider::class, force: true);
+    $this->app->getProvider(InkServiceProvider::class)->packageBooted();
 
     $tag = Tag::factory()->create(['name' => 'Disabled']);
 
@@ -69,11 +69,11 @@ test('tag archive route 404s when tags feature disabled', function () {
 });
 
 test('tag archive route lists posts attached to that tag when feature enabled', function () {
-    config()->set('filament-blog.features.tags', true);
-    config()->set('filament-blog.features.public_routes', true);
-    config()->set('filament-blog.layout', 'tests::layouts.empty');
-    $this->app->register(FilamentBlogServiceProvider::class, force: true);
-    $this->app->getProvider(FilamentBlogServiceProvider::class)->packageBooted();
+    config()->set('ink.features.tags', true);
+    config()->set('ink.features.public_routes', true);
+    config()->set('ink.layout', 'tests::layouts.empty');
+    $this->app->register(InkServiceProvider::class, force: true);
+    $this->app->getProvider(InkServiceProvider::class)->packageBooted();
 
     $tag = Tag::factory()->create(['name' => 'Laravel']);
     $included = Post::factory()->published()->create(['title' => 'Tagged post']);
@@ -87,7 +87,7 @@ test('tag archive route lists posts attached to that tag when feature enabled', 
 });
 
 test('PostResource featured image field uses plain FileUpload by default', function () {
-    config()->set('filament-blog.features.media_library', false);
+    config()->set('ink.features.media_library', false);
 
     $field = (new ReflectionMethod(PostResource::class, 'featuredImageField'))
         ->invoke(null);
@@ -98,7 +98,7 @@ test('PostResource featured image field uses plain FileUpload by default', funct
 test('PostResource featured image field falls back to FileUpload when MediaLibrary class missing', function () {
     // The Spatie class doesn't ship with this test environment, so even with
     // the flag on, we should fall back to the plain component (no crash).
-    config()->set('filament-blog.features.media_library', true);
+    config()->set('ink.features.media_library', true);
 
     $field = (new ReflectionMethod(PostResource::class, 'featuredImageField'))
         ->invoke(null);

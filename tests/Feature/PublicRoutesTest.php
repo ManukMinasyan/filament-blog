@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
-use ManukMinasyan\FilamentBlog\FilamentBlogServiceProvider;
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\InkServiceProvider;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
 
 beforeEach(function () {
-    config()->set('filament-blog.features.public_routes', true);
-    config()->set('filament-blog.layout', 'tests::layouts.empty');
+    config()->set('ink.features.public_routes', true);
+    config()->set('ink.layout', 'tests::layouts.empty');
 
     // Re-boot the package so routes register with the just-set config flag.
-    $this->app->register(FilamentBlogServiceProvider::class, force: true);
-    $this->app->getProvider(FilamentBlogServiceProvider::class)->packageBooted();
+    $this->app->register(InkServiceProvider::class, force: true);
+    $this->app->getProvider(InkServiceProvider::class)->packageBooted();
 });
 
 test('public index route returns published posts when feature enabled', function () {
@@ -26,11 +26,11 @@ test('public index route returns published posts when feature enabled', function
 });
 
 test('public index route is not registered when feature disabled', function () {
-    config()->set('filament-blog.features.public_routes', false);
+    config()->set('ink.features.public_routes', false);
 
     // Simulate fresh boot with feature off
     $this->refreshApplication();
-    config()->set('filament-blog.features.public_routes', false);
+    config()->set('ink.features.public_routes', false);
 
     expect(Route::has('blog.index'))->toBeFalse();
 });
@@ -95,7 +95,7 @@ test('preview route 403s without signature', function () {
 });
 
 test('feed route returns RSS XML when feed feature enabled', function () {
-    config()->set('filament-blog.features.feed', true);
+    config()->set('ink.features.feed', true);
 
     Post::factory()->published()->create(['title' => 'Hello feed']);
 
@@ -108,7 +108,7 @@ test('feed route returns RSS XML when feed feature enabled', function () {
 });
 
 test('feed route 404s when feed feature disabled', function () {
-    config()->set('filament-blog.features.feed', false);
+    config()->set('ink.features.feed', false);
 
     $this->get(route('blog.feed'))->assertNotFound();
 });

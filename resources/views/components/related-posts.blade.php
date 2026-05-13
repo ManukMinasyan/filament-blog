@@ -2,7 +2,7 @@
     <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Related posts</h2>
     <div class="divide-y divide-gray-100 dark:divide-gray-800">
         @foreach($posts as $relatedPost)
-            <x-blog::post-card :post="$relatedPost" />
+            <x-ink::post-card :post="$relatedPost" />
         @endforeach
     </div>
 </section>

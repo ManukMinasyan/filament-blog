@@ -1,5 +1,5 @@
 {
-    "name": "filament-blog-docs",
+    "name": "ink-docs",
     "scripts": {
         "dev": "nuxt dev --extends docus",
         "build": "nuxt build --extends docus",
