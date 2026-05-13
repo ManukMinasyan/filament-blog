@@ -19,5 +19,8 @@
 - [Configuration](https://relaticle.github.io/ink/essentials/configuration): Full configuration reference for Ink.
 - [Tags Taxonomy](https://relaticle.github.io/ink/essentials/tags): Opt-in many-to-many tags taxonomy with admin UI and public archive.
 - [MediaLibrary Integration](https://relaticle.github.io/ink/essentials/media-library): Opt-in featured-image upload via spatie/laravel-medialibrary.
+- [Search](https://relaticle.github.io/ink/essentials/search): Portable search across blog posts with a config-driven backend hook.
+- [Schema](https://relaticle.github.io/ink/essentials/schema): Automatic JSON-LD schema emission for posts and listings.
+- [Listing SEO](https://relaticle.github.io/ink/essentials/listing-seo): Per-page canonicals, titles, and metadata for listing routes.
 - [Contributing](https://relaticle.github.io/ink/community/contributing): How to contribute to Ink.
 - [License](https://relaticle.github.io/ink/community/license): License information.

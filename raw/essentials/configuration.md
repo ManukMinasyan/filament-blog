@@ -81,6 +81,31 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Schema auto-emission
+    |--------------------------------------------------------------------------
+    | Detect FAQ and HowTo sections in post content and emit JSON-LD schema
+    | automatically. FAQ detection looks for an `## FAQ` H2 followed by H3
+    | question / paragraph answer pairs. HowTo detection looks for a `## Steps`
+    | H2 followed by H3 step headings.
+    */
+    'schema' => [
+        'faq_auto' => true,
+        'howto_auto' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    | Defaults to a portable LIKE search across title/excerpt/content.
+    | Override `callback` to use Postgres FTS, MySQL FULLTEXT, Scout, etc.
+    */
+    'search' => [
+        'callback' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | RSS feed metadata
     |--------------------------------------------------------------------------
     */

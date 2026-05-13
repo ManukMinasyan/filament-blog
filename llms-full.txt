@@ -623,6 +623,20 @@ Sticky amber banner for draft previews. Pushes `noindex` meta tag.
 <x-ink::preview-banner :post="$post" :editUrl="$editUrl" />
 ```
 
+## Pagination
+
+The package ships a numbered, aria-labeled pagination view used by the index/category/tag pages. To use it in your own views:
+
+```blade
+{{ $posts->links('ink::pagination.blog') }}
+```
+
+The view emits `aria-label="Blog pagination"` on the nav, `aria-current="page"` on the active page, and `wire:navigate` on every link.
+
+## Search (Livewire)
+
+Drop `<livewire:blog::search />` anywhere. It reads `?q=` from the URL, debounces 400ms, and renders up to 20 matching posts. Empty queries show no results until the user types.
+
 
 # Filament Admin
 
@@ -832,6 +846,31 @@ return [
         // when both this flag is on AND spatie/laravel-medialibrary is
         // installed. See: essentials/media-library
         'media_library' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Schema auto-emission
+    |--------------------------------------------------------------------------
+    | Detect FAQ and HowTo sections in post content and emit JSON-LD schema
+    | automatically. FAQ detection looks for an `## FAQ` H2 followed by H3
+    | question / paragraph answer pairs. HowTo detection looks for a `## Steps`
+    | H2 followed by H3 step headings.
+    */
+    'schema' => [
+        'faq_auto' => true,
+        'howto_auto' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Search
+    |--------------------------------------------------------------------------
+    | Defaults to a portable LIKE search across title/excerpt/content.
+    | Override `callback` to use Postgres FTS, MySQL FULLTEXT, Scout, etc.
+    */
+    'search' => [
+        'callback' => null,
     ],
 
     /*
@@ -1110,6 +1149,165 @@ When Phase 3 lands, existing posts with a `featured_image` string path will be m
 2. **Manual migration** — write your own script to copy `featured_image` files into MediaLibrary on a `featured_image` collection.
 
 Both Tapix and FilaForms blogs (which this package replaces) use the same string-column approach, so flipping the flag without migration leaves you in a usable state — new posts go to MediaLibrary, old posts keep using the string path. The shipped views render whichever exists.
+
+
+# Search
+
+The package ships a `Post::search($term)` query scope and a `BlogSearch` Livewire component.
+
+## Default behavior
+
+`Post::search($term)` does a `LIKE` search across `title`, `excerpt`, and `content`. Works on every database driver out of the box.
+
+```php
+$posts = Post::query()
+    ->published()
+    ->search($request->query('q', ''))
+    ->latest('published_at')
+    ->paginate(12);
+```
+
+Empty / whitespace-only terms are no-ops — the scope leaves the query unchanged. LIKE wildcards in the term are escaped.
+
+## Override the backend
+
+Set `search.callback` in `config/ink.php` to use Postgres FTS, MySQL FULLTEXT, Scout, Meilisearch, or anything else:
+
+```php
+'search' => [
+    'callback' => function (\Illuminate\Database\Eloquent\Builder $query, string $term): void {
+        $query->whereRaw(
+            "to_tsvector('english', title || ' ' || excerpt || ' ' || content) @@ plainto_tsquery('english', ?)",
+            [$term]
+        );
+    },
+],
+```
+
+Whatever the callback applies becomes the search strategy. Empty terms still short-circuit before the callback fires.
+
+## Livewire component
+
+Use `<livewire:blog::search />` anywhere. It reads `?q=` from the URL, debounces 400ms, and renders up to 20 matches with an empty state.
+
+To restyle, publish the view:
+
+```bash
+php artisan vendor:publish --tag=ink-views
+```
+
+Then edit `resources/views/vendor/ink/livewire/blog-search.blade.php`.
+
+## SEO
+
+When the shipped `/blog` route handles `?q=`, the package emits `<meta name="robots" content="noindex,follow">` on the search result page. Search queries should not be indexed as separate URLs.
+
+
+# Schema
+
+The package emits JSON-LD schema automatically for blog content. Each schema type can be toggled in `config/ink.php`.
+
+## What's emitted by default
+
+| Schema           | Where                                                | Toggle                                      |
+| ---------------- | ---------------------------------------------------- | ------------------------------------------- |
+| `BlogPosting`    | Post pages                                           | Always on (via `Post::getDynamicSEOData()`) |
+| `BreadcrumbList` | Post pages                                           | Always on                                   |
+| `FAQPage`        | Post pages with `## FAQ` section                     | `schema.faq_auto` (default `true`)          |
+| `HowTo`          | Post pages with `## Steps` section                   | `schema.howto_auto` (default `false`)       |
+| `Blog`           | `/blog` index                                        | Always when public-routes mode is on        |
+| `CollectionPage` | `/blog`, `/blog/category/{slug}`, `/blog/tag/{slug}` | Always when public-routes mode is on        |
+
+## FAQPage conventions
+
+To trigger FAQPage emission, include a `## FAQ` heading followed by `### Question?` and a paragraph answer:
+
+```markdown
+## FAQ
+
+### Does the package auto-emit schema?
+Yes — FAQ schema is on by default.
+
+### Can I turn it off?
+Set `schema.faq_auto` to `false`.
+```
+
+## HowTo conventions
+
+To trigger HowTo emission, opt in via `schema.howto_auto = true` and write a `## Steps` section with `### Step Name` headings:
+
+```markdown
+## Steps
+
+### Install the package
+Run `composer require relaticle/ink`.
+
+### Publish the config
+Run `php artisan vendor:publish --tag=ink-config`.
+```
+
+Each `### heading` becomes a `HowToStep` with auto-incremented `position`.
+
+## Disabling auto-detection
+
+```php
+'schema' => [
+    'faq_auto' => false,
+    'howto_auto' => false,
+],
+```
+
+The `BlogPosting` + `BreadcrumbList` schemas remain on regardless — they're considered baseline for any blog.
+
+## Validate your schema
+
+After publishing, paste a post URL into [Google Rich Results Test](https://search.google.com/test/rich-results){rel="nofollow"} or the [Schema.org Validator](https://validator.schema.org/){rel="nofollow"} to confirm zero errors.
+
+
+# Listing SEO
+
+The package's listing routes (`/blog`, `/blog/category/{slug}`, `/blog/tag/{slug}`) emit per-page canonical URLs, titles, and metadata via `BlogListingSeo`.
+
+## Behavior
+
+| Route                   | Page 1 canonical        | Page N canonical               |
+| ----------------------- | ----------------------- | ------------------------------ |
+| `/blog`                 | `/blog`                 | `/blog?page=N`                 |
+| `/blog?q=term`          | `/blog`                 | `noindex,follow`               |
+| `/blog/category/guides` | `/blog/category/guides` | `/blog/category/guides?page=N` |
+| `/blog/tag/filament`    | `/blog/tag/filament`    | `/blog/tag/filament?page=N`    |
+
+Titles include `— Page N` from page 2 onward.
+
+## Headless consumers
+
+If you write your own controllers in headless mode, call the helper directly:
+
+```php
+use Relaticle\Ink\Support\BlogListingSeo;
+
+public function index(Request $request)
+{
+    $page = (int) $request->query('page', 1);
+    seo()->for(BlogListingSeo::forIndex(page: $page, searchQuery: $request->query('q')));
+
+    return view('blog.index', [...]);
+}
+```
+
+Available factories:
+
+- `BlogListingSeo::forIndex(int $page = 1, ?string $searchQuery = null): SEOData`
+- `BlogListingSeo::forCategory(Category $category, int $page = 1): SEOData`
+- `BlogListingSeo::forTag(Tag $tag, int $page = 1): SEOData`
+
+## Pagination
+
+The package ships a numbered, aria-labeled pagination view at `ink::pagination.blog`. Listing pages use it by default. Publish to customize:
+
+```bash
+php artisan vendor:publish --tag=ink-views
+```
 
 
 # Contributing
