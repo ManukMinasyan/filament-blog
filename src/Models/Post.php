@@ -18,11 +18,13 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use RalphJSmit\Laravel\SEO\Schema\ArticleSchema;
 use RalphJSmit\Laravel\SEO\Schema\BreadcrumbListSchema;
+use RalphJSmit\Laravel\SEO\Schema\FaqPageSchema;
 use RalphJSmit\Laravel\SEO\SchemaCollection;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 use Relaticle\Ink\Database\Factories\PostFactory;
 use Relaticle\Ink\Enums\PostStatus;
+use Relaticle\Ink\Support\SchemaExtractor;
 use Spatie\LaravelMarkdown\MarkdownRenderer;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -134,6 +136,32 @@ class Post extends Model
             });
     }
 
+    #[Scope]
+    protected function search(Builder $query, string $term): void
+    {
+        $term = trim($term);
+
+        if ($term === '') {
+            return;
+        }
+
+        $callback = config('ink.search.callback');
+
+        if (is_callable($callback)) {
+            $callback($query, $term);
+
+            return;
+        }
+
+        $like = '%'.str_replace(['%', '_'], ['\\%', '\\_'], $term).'%';
+
+        $query->where(function (Builder $q) use ($like): void {
+            $q->where('title', 'like', $like)
+                ->orWhere('excerpt', 'like', $like)
+                ->orWhere('content', 'like', $like);
+        });
+    }
+
     public function toHtml(): string
     {
         return Cache::rememberForever(
@@ -242,6 +270,20 @@ class Post extends Model
 
                 return $breadcrumbs->prependBreadcrumbs($crumbs);
             });
+
+        if (config('ink.schema.faq_auto', true)) {
+            $faqEntities = SchemaExtractor::extractFaqEntities($this->renderedContent());
+
+            if ($faqEntities !== []) {
+                $schema = $schema->addFaqPage(function (FaqPageSchema $faq) use ($faqEntities): FaqPageSchema {
+                    foreach ($faqEntities as $entity) {
+                        $faq->addQuestion($entity['name'], $entity['acceptedAnswer']['text']);
+                    }
+
+                    return $faq;
+                });
+            }
+        }
 
         return new SEOData(
             title: $this->title,

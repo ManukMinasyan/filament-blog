@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Route;
 use Relaticle\Ink\Models\Category;
 use Relaticle\Ink\Models\Post;
+use Relaticle\Ink\Models\Tag;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
@@ -49,6 +50,19 @@ class BlogSitemapGenerator
                             ->setLastModificationDate($post->updated_at)
                             ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                             ->setPriority(0.7)
+                    );
+                });
+        }
+
+        if (Route::has('blog.tag') && config('ink.features.tags', false)) {
+            Tag::query()
+                ->select(['id', 'slug'])
+                ->whereHas('posts', fn (Builder $query) => $query->published())
+                ->each(function (Tag $tag) use ($sitemap): void {
+                    $sitemap->add(
+                        Url::create(route('blog.tag', $tag->slug))
+                            ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
+                            ->setPriority(0.5)
                     );
                 });
         }
