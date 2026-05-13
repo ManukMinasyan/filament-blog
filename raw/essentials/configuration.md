@@ -5,12 +5,12 @@
 Publish the config file:
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-config
+php artisan vendor:publish --tag=ink-config
 ```
 
 ## Full reference
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 return [
     /*
     |--------------------------------------------------------------------------
@@ -94,7 +94,7 @@ return [
     |--------------------------------------------------------------------------
     | JSON-LD publisher block
     |--------------------------------------------------------------------------
-    | Used by <x-blog::structured-data> and the Post::getDynamicSEOData()
+    | Used by <x-ink::structured-data> and the Post::getDynamicSEOData()
     | Article schema. Leave nulls to omit fields.
     */
     'publisher' => [
@@ -122,7 +122,7 @@ return [
 Add blog URLs to your sitemap generation:
 
 ```php [GenerateSitemapCommand.php]
-use ManukMinasyan\FilamentBlog\BlogSitemapGenerator;
+use Relaticle\Ink\BlogSitemapGenerator;
 use Spatie\Sitemap\Sitemap;
 
 $sitemap = Sitemap::create();
@@ -137,7 +137,7 @@ The generator is route-aware — it only adds URLs for routes that exist in your
 Publish all Blade page + component views:
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-views
+php artisan vendor:publish --tag=ink-views
 ```
 
 Published files go to:
@@ -150,7 +150,7 @@ Edit them to match your design system. Once published, the package no longer ser
 ## Customizing translations
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-translations
+php artisan vendor:publish --tag=ink-translations
 ```
 
 (No translations ship by default; this tag exists for future localization.)

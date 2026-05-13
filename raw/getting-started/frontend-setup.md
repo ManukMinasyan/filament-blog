@@ -15,7 +15,7 @@ In headless mode the package ships **no routes, no controllers, no page views**.
 ```php [routes/web.php]
 use App\Http\Controllers\BlogController;
 
-Route::prefix('blog')->name('blog.')->group(function () {
+Route::prefix('ink')->name('blog.')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('index');
     Route::get('/feed', [BlogController::class, 'feed'])->name('feed');
     Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
@@ -31,9 +31,9 @@ The route names matter — the package's URL helpers and SEO components check fo
 ## Create controller
 
 ```php [app/Http/Controllers/BlogController.php]
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
-use ManukMinasyan\FilamentBlog\Models\Tag;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
+use Relaticle\Ink\Models\Tag;
 
 final readonly class BlogController
 {
@@ -43,7 +43,7 @@ final readonly class BlogController
             ->published()
             ->with(['category', 'author', 'seo'])
             ->latest('published_at')
-            ->paginate(config('filament-blog.per_page', 12));
+            ->paginate(config('ink.per_page', 12));
 
         return view('blog.index', compact('posts'));
     }
@@ -69,7 +69,7 @@ final readonly class BlogController
             ->published()
             ->with(['category', 'author', 'seo'])
             ->latest('published_at')
-            ->paginate(config('filament-blog.per_page', 12));
+            ->paginate(config('ink.per_page', 12));
 
         return view('blog.category', compact('category', 'posts'));
     }
@@ -82,7 +82,7 @@ final readonly class BlogController
             ->published()
             ->with(['category', 'author', 'seo'])
             ->latest('published_at')
-            ->paginate(config('filament-blog.per_page', 12));
+            ->paginate(config('ink.per_page', 12));
 
         return view('blog.tag', compact('tag', 'posts'));
     }
@@ -115,22 +115,22 @@ Use the package's Blade components inside your own page templates:
 ```blade [resources/views/blog/show.blade.php]
 <x-your-layout>
     @push('head')
-        <x-blog::meta-tags :post="$post" />
-        <x-blog::feed-link />
+        <x-ink::meta-tags :post="$post" />
+        <x-ink::feed-link />
     @endpush
 
-    <x-blog::structured-data :post="$post" />
+    <x-ink::structured-data :post="$post" />
 
-    <x-blog::post-header :post="$post" />
-    <x-blog::post-body :post="$post" />
-    <x-blog::related-posts :posts="$relatedPosts" />
+    <x-ink::post-header :post="$post" />
+    <x-ink::post-body :post="$post" />
+    <x-ink::related-posts :posts="$relatedPosts" />
 </x-your-layout>
 ```
 
 ```blade [resources/views/blog/index.blade.php]
 <x-your-layout>
     @foreach($posts as $post)
-        <x-blog::post-card :post="$post" />
+        <x-ink::post-card :post="$post" />
     @endforeach
 
     {{ $posts->links() }}
@@ -138,7 +138,7 @@ Use the package's Blade components inside your own page templates:
 ```
 
 ```blade [resources/views/blog/feed.blade.php]
-<x-blog::feed :posts="$posts" />
+<x-ink::feed :posts="$posts" />
 ```
 
 ## Helpers on the Post model

@@ -13,8 +13,8 @@ Contributions are welcome! Here's how to get started:
 ## Development Setup
 
 ```bash [Terminal]
-git clone git@github.com:ManukMinasyan/filament-blog.git
-cd filament-blog
+git clone git@github.com:relaticle/ink.git
+cd ink
 composer install
 ```
 

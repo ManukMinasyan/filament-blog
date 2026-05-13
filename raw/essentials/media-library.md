@@ -17,7 +17,7 @@ composer require spatie/laravel-medialibrary
 php artisan vendor:publish --provider="Spatie\MediaLibrary\MediaLibraryServiceProvider" --tag="medialibrary-migrations"
 php artisan migrate
 ```
-2. Flip the flag:```php [config/filament-blog.php]
+2. Flip the flag:```php [config/ink.php]
 'features' => [
     'media_library' => true,
 ],
@@ -33,7 +33,7 @@ If you want the full integration today, override the `Post` model in your app:
 ```php [app/Models/BlogPost.php]
 namespace App\Models;
 
-use ManukMinasyan\FilamentBlog\Models\Post as BasePost;
+use Relaticle\Ink\Models\Post as BasePost;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
@@ -51,14 +51,14 @@ class BlogPost extends BasePost implements HasMedia
 
 Then point the package at your model:
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 // (post_model is not currently a config key — track this in
 // Phase 3 follow-up; for now the package always uses its own Post)
 ```
 
 <alert type="warning">
 
-Swapping the post model isn't a config option in v1.4 — that lands in Phase 3 along with the model-side integration. Watch the [GitHub releases](https://github.com/ManukMinasyan/filament-blog/releases) for `v1.5`.
+Swapping the post model isn't a config option in v1.4 — that lands in Phase 3 along with the model-side integration. Watch the [GitHub releases](https://github.com/relaticle/ink/releases) for `v1.5`.
 
 </alert>
 

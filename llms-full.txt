@@ -12,7 +12,7 @@ Ships the admin, SEO components, MCP tools, and Blade components. Bring your own
   ---
   color: neutral
   size: xl
-  to: https://manukminasyan.github.io/filament-blog/getting-started/installation
+  to: https://relaticle.github.io/filament-blog/getting-started/installation
   trailing-icon: i-lucide-arrow-right
   ---
   Get started
@@ -23,7 +23,7 @@ Ships the admin, SEO components, MCP tools, and Blade components. Bring your own
   color: neutral
   icon: simple-icons:github
   size: xl
-  to: https://github.com/ManukMinasyan/filament-blog
+  to: https://github.com/relaticle/ink
   variant: outline
   ---
   Source on GitHub
@@ -118,7 +118,7 @@ What's included
 ### Install Package
 
 ```bash [Terminal]
-composer require manukminasyan/filament-blog
+composer require relaticle/ink
 ```
 
   :::alert{type="info"}
@@ -126,7 +126,7 @@ composer require manukminasyan/filament-blog
   
   ```json [composer.json]
   "repositories": [
-      {"type": "vcs", "url": "git@github.com:ManukMinasyan/filament-blog.git"}
+      {"type": "vcs", "url": "git@github.com:relaticle/ink.git"}
   ]
   ```
   :::
@@ -142,17 +142,17 @@ This creates `blog_posts`, `blog_categories`, `blog_tags`, and `blog_post_tag` t
 ### Register Filament Plugin
 
 ```php [AppPanelProvider.php]
-use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+use Relaticle\Ink\InkPlugin;
 
 $panel->plugins([
-    FilamentBlogPlugin::make(),
+    InkPlugin::make(),
 ]);
 ```
 
 ### Publish Config (optional)
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-config
+php artisan vendor:publish --tag=ink-config
 ```
 ::
 
@@ -162,18 +162,18 @@ php artisan vendor:publish --tag=filament-blog-config
 
 The package ships **two install modes**:
 
-| Mode                            | When to use                                                                  | Doc                                                                                                       |
-| ------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| **Headless (default)**          | You want the Blade components and admin, but full control over routing/views | [Frontend Setup (headless)](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup) |
-| **Public-routes mode (opt-in)** | You want a working blog at `/blog` without writing a single controller       | [Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode)    |
+| Mode                            | When to use                                                                  | Doc                                                                                                   |
+| ------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Headless (default)**          | You want the Blade components and admin, but full control over routing/views | [Frontend Setup (headless)](https://relaticle.github.io/filament-blog/getting-started/frontend-setup) |
+| **Public-routes mode (opt-in)** | You want a working blog at `/blog` without writing a single controller       | [Public-routes mode](https://relaticle.github.io/filament-blog/getting-started/public-routes-mode)    |
 
 Most teams porting from the Tapix/FilaForms internal blog packages want public-routes mode — it ships the same flow they had, just behind a flag.
 
 ## Default config
 
-After publishing, `config/filament-blog.php` looks like this. Everything is opt-in — defaults match the headless mode, so the package is a no-op until you flip a flag:
+After publishing, `config/ink.php` looks like this. Everything is opt-in — defaults match the headless mode, so the package is a no-op until you flip a flag:
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 return [
     'prefix' => 'blog',
     'layout' => 'layouts.app',
@@ -207,7 +207,7 @@ return [
 ];
 ```
 
-See [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration) for the full reference.
+See [Configuration](https://relaticle.github.io/filament-blog/essentials/configuration) for the full reference.
 
 ## Morph Map
 
@@ -216,9 +216,9 @@ If your app enforces morph maps, register the blog models:
 ```php [AppServiceProvider.php]
 Relation::enforceMorphMap([
     // ...existing entries
-    'blog_post' => \ManukMinasyan\FilamentBlog\Models\Post::class,
-    'blog_category' => \ManukMinasyan\FilamentBlog\Models\Category::class,
-    'blog_tag' => \ManukMinasyan\FilamentBlog\Models\Tag::class,
+    'blog_post' => \Relaticle\Ink\Models\Post::class,
+    'blog_category' => \Relaticle\Ink\Models\Category::class,
+    'blog_tag' => \Relaticle\Ink\Models\Tag::class,
 ]);
 ```
 
@@ -237,7 +237,7 @@ The schema is identical (`blog_posts` and `blog_categories` table names match). 
 
 ```bash [Terminal]
 composer remove tapix/blog        # or filaforms/blog
-composer require manukminasyan/filament-blog
+composer require relaticle/ink
 ```
 
 Then enable public-routes mode in config:
@@ -259,7 +259,7 @@ No data migration needed.
 
  See 
 
-[Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode)
+[Public-routes mode](https://relaticle.github.io/filament-blog/getting-started/public-routes-mode)
 
  — flip a config flag and you're done. This page covers the 
 
@@ -275,7 +275,7 @@ In headless mode the package ships **no routes, no controllers, no page views**.
 ```php [routes/web.php]
 use App\Http\Controllers\BlogController;
 
-Route::prefix('blog')->name('blog.')->group(function () {
+Route::prefix('ink')->name('blog.')->group(function () {
     Route::get('/', [BlogController::class, 'index'])->name('index');
     Route::get('/feed', [BlogController::class, 'feed'])->name('feed');
     Route::get('/category/{slug}', [BlogController::class, 'category'])->name('category');
@@ -291,9 +291,9 @@ The route names matter — the package's URL helpers and SEO components check fo
 ## Create controller
 
 ```php [app/Http/Controllers/BlogController.php]
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
-use ManukMinasyan\FilamentBlog\Models\Tag;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
+use Relaticle\Ink\Models\Tag;
 
 final readonly class BlogController
 {
@@ -303,7 +303,7 @@ final readonly class BlogController
             ->published()
             ->with(['category', 'author', 'seo'])
             ->latest('published_at')
-            ->paginate(config('filament-blog.per_page', 12));
+            ->paginate(config('ink.per_page', 12));
 
         return view('blog.index', compact('posts'));
     }
@@ -329,7 +329,7 @@ final readonly class BlogController
             ->published()
             ->with(['category', 'author', 'seo'])
             ->latest('published_at')
-            ->paginate(config('filament-blog.per_page', 12));
+            ->paginate(config('ink.per_page', 12));
 
         return view('blog.category', compact('category', 'posts'));
     }
@@ -342,7 +342,7 @@ final readonly class BlogController
             ->published()
             ->with(['category', 'author', 'seo'])
             ->latest('published_at')
-            ->paginate(config('filament-blog.per_page', 12));
+            ->paginate(config('ink.per_page', 12));
 
         return view('blog.tag', compact('tag', 'posts'));
     }
@@ -375,22 +375,22 @@ Use the package's Blade components inside your own page templates:
 ```blade [resources/views/blog/show.blade.php]
 <x-your-layout>
     @push('head')
-        <x-blog::meta-tags :post="$post" />
-        <x-blog::feed-link />
+        <x-ink::meta-tags :post="$post" />
+        <x-ink::feed-link />
     @endpush
 
-    <x-blog::structured-data :post="$post" />
+    <x-ink::structured-data :post="$post" />
 
-    <x-blog::post-header :post="$post" />
-    <x-blog::post-body :post="$post" />
-    <x-blog::related-posts :posts="$relatedPosts" />
+    <x-ink::post-header :post="$post" />
+    <x-ink::post-body :post="$post" />
+    <x-ink::related-posts :posts="$relatedPosts" />
 </x-your-layout>
 ```
 
 ```blade [resources/views/blog/index.blade.php]
 <x-your-layout>
     @foreach($posts as $post)
-        <x-blog::post-card :post="$post" />
+        <x-ink::post-card :post="$post" />
     @endforeach
 
     {{ $posts->links() }}
@@ -398,7 +398,7 @@ Use the package's Blade components inside your own page templates:
 ```
 
 ```blade [resources/views/blog/feed.blade.php]
-<x-blog::feed :posts="$posts" />
+<x-ink::feed :posts="$posts" />
 ```
 
 ## Helpers on the Post model
@@ -426,7 +426,7 @@ The package checks for these names when generating URLs. If a route is missing, 
 
 ## Promote to public-routes mode any time
 
-If writing all this gets old, flip the flag in config and delete your controller — the package will register equivalent routes automatically. See [Public-routes mode](https://manukminasyan.github.io/filament-blog/getting-started/public-routes-mode).
+If writing all this gets old, flip the flag in config and delete your controller — the package will register equivalent routes automatically. See [Public-routes mode](https://relaticle.github.io/filament-blog/getting-started/public-routes-mode).
 
 
 # Public-routes mode
@@ -444,7 +444,7 @@ The package ships an **opt-in public-routes mode**. Flip a flag in config and yo
 
 ## Enable it
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 'features' => [
     'public_routes' => true,
     'feed'          => true,   // optional, enables /blog/feed
@@ -478,7 +478,7 @@ The page views extend the layout you set in `'layout'`. It must define a `@yield
 If your layout uses a different slot mechanism (e.g. Blade components with `{{ $slot }}`), publish the page views and adapt them:
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-views
+php artisan vendor:publish --tag=ink-views
 ```
 
 ## Customizing pages
@@ -522,12 +522,12 @@ When a flag is off, requests to that path return **404** (not registered). `Rout
 | Custom domain logic   | Yes (any)       | Limited to view overrides |
 | Effort to ship a blog | \~2 hours       | \~5 minutes               |
 
-If you outgrow public-routes mode, flip the flag back to `false` and write your own controllers — see [Frontend Setup (headless)](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup).
+If you outgrow public-routes mode, flip the flag back to `false` and write your own controllers — see [Frontend Setup (headless)](https://relaticle.github.io/filament-blog/getting-started/frontend-setup).
 
 
 # Blade Components
 
-All components are publishable. Run `php artisan vendor:publish --tag=filament-blog-views` to customize.
+All components are publishable. Run `php artisan vendor:publish --tag=ink-views` to customize.
 
 ## SEO Components
 
@@ -537,7 +537,7 @@ Renders Open Graph, Twitter Card, and article meta tags in `<head>`.
 
 ```blade
 @push('head')
-    <x-blog::meta-tags :post="$post" />
+    <x-ink::meta-tags :post="$post" />
 @endpush
 ```
 
@@ -548,7 +548,7 @@ Renders Open Graph, Twitter Card, and article meta tags in `<head>`.
 Renders JSON-LD `BlogPosting` schema with publisher and breadcrumb data.
 
 ```blade
-<x-blog::structured-data :post="$post" />
+<x-ink::structured-data :post="$post" />
 ```
 
 **Renders:** `@type: BlogPosting` with headline, description, datePublished, dateModified, author, publisher (from config), articleSection, articleBody, and image.
@@ -559,7 +559,7 @@ Renders RSS `<link>` tag in `<head>`. Only renders if `blog.feed` route exists a
 
 ```blade
 @push('head')
-    <x-blog::feed-link />
+    <x-ink::feed-link />
 @endpush
 ```
 
@@ -569,7 +569,7 @@ Renders full RSS 2.0 XML. Use in your feed route view:
 
 ```blade
 {{-- resources/views/blog/feed.blade.php --}}
-<x-blog::feed :posts="$posts" />
+<x-ink::feed :posts="$posts" />
 ```
 
 ## UI Components
@@ -579,7 +579,7 @@ Renders full RSS 2.0 XML. Use in your feed route view:
 Displays a post in a listing. Shows category badge, date, title, excerpt, and featured image thumbnail.
 
 ```blade
-<x-blog::post-card :post="$post" />
+<x-ink::post-card :post="$post" />
 ```
 
 ### Post Header
@@ -587,7 +587,7 @@ Displays a post in a listing. Shows category badge, date, title, excerpt, and fe
 Renders category badge, title, author name, published date, and estimated read time.
 
 ```blade
-<x-blog::post-header :post="$post" />
+<x-ink::post-header :post="$post" />
 ```
 
 ### Post Body
@@ -595,7 +595,7 @@ Renders category badge, title, author name, published date, and estimated read t
 Renders featured image and markdown content in a Tailwind prose container with dark mode support.
 
 ```blade
-<x-blog::post-body :post="$post" />
+<x-ink::post-body :post="$post" />
 ```
 
 ### Related Posts
@@ -603,7 +603,7 @@ Renders featured image and markdown content in a Tailwind prose container with d
 Shows related posts section. Only renders if the collection is not empty.
 
 ```blade
-<x-blog::related-posts :posts="$relatedPosts" />
+<x-ink::related-posts :posts="$relatedPosts" />
 ```
 
 ### Category Badge
@@ -611,8 +611,8 @@ Shows related posts section. Only renders if the collection is not empty.
 Displays a category pill. Links to category page if `blog.category` route exists.
 
 ```blade
-<x-blog::category-badge :category="$post->category" />
-<x-blog::category-badge :category="$post->category" :linked="false" />
+<x-ink::category-badge :category="$post->category" />
+<x-ink::category-badge :category="$post->category" :linked="false" />
 ```
 
 ### Preview Banner
@@ -620,7 +620,7 @@ Displays a category pill. Links to category page if `blog.category` route exists
 Sticky amber banner for draft previews. Pushes `noindex` meta tag.
 
 ```blade
-<x-blog::preview-banner :post="$post" :editUrl="$editUrl" />
+<x-ink::preview-banner :post="$post" :editUrl="$editUrl" />
 ```
 
 
@@ -683,15 +683,15 @@ Appears in the Blog navigation group when `features.tags` is enabled. Mirrors th
 
 When the flag is off, the resource class still exists but `shouldRegisterNavigation()` returns `false` so it doesn't appear in the sidebar.
 
-See the [Tags Taxonomy](https://manukminasyan.github.io/filament-blog/essentials/tags) page for full schema and usage.
+See the [Tags Taxonomy](https://relaticle.github.io/filament-blog/essentials/tags) page for full schema and usage.
 
 ## Plugin Registration
 
 ```php [AppPanelProvider.php]
-use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+use Relaticle\Ink\InkPlugin;
 
 $panel->plugins([
-    FilamentBlogPlugin::make(),
+    InkPlugin::make(),
 ]);
 ```
 
@@ -730,7 +730,7 @@ The package includes 13 Model Context Protocol tools for full blog management vi
 Register the tools in your MCP server:
 
 ```php [app/Mcp/Servers/BlogServer.php]
-use ManukMinasyan\FilamentBlog\Mcp\Tools;
+use Relaticle\Ink\Mcp\Tools;
 
 class BlogServer extends Server
 {
@@ -760,12 +760,12 @@ All tools require admin authentication and specific token abilities (Sanctum). T
 Publish the config file:
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-config
+php artisan vendor:publish --tag=ink-config
 ```
 
 ## Full reference
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 return [
     /*
     |--------------------------------------------------------------------------
@@ -849,7 +849,7 @@ return [
     |--------------------------------------------------------------------------
     | JSON-LD publisher block
     |--------------------------------------------------------------------------
-    | Used by <x-blog::structured-data> and the Post::getDynamicSEOData()
+    | Used by <x-ink::structured-data> and the Post::getDynamicSEOData()
     | Article schema. Leave nulls to omit fields.
     */
     'publisher' => [
@@ -877,7 +877,7 @@ return [
 Add blog URLs to your sitemap generation:
 
 ```php [GenerateSitemapCommand.php]
-use ManukMinasyan\FilamentBlog\BlogSitemapGenerator;
+use Relaticle\Ink\BlogSitemapGenerator;
 use Spatie\Sitemap\Sitemap;
 
 $sitemap = Sitemap::create();
@@ -892,7 +892,7 @@ The generator is route-aware — it only adds URLs for routes that exist in your
 Publish all Blade page + component views:
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-views
+php artisan vendor:publish --tag=ink-views
 ```
 
 Published files go to:
@@ -905,7 +905,7 @@ Edit them to match your design system. Once published, the package no longer ser
 ## Customizing translations
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-translations
+php artisan vendor:publish --tag=ink-translations
 ```
 
 (No translations ship by default; this tag exists for future localization.)
@@ -917,7 +917,7 @@ Tags are an **opt-in** feature — the schema ships with every install but the a
 
 ## Enable
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 'features' => [
     'tags' => true,
 ],
@@ -949,7 +949,7 @@ Soft deletes are enabled on `blog_tags`. Pivot rows cascade-delete when a post o
 
 ## Model
 
-`ManukMinasyan\FilamentBlog\Models\Tag`:
+`Relaticle\Ink\Models\Tag`:
 
 ```php
 $tag = Tag::factory()->create(['name' => 'Laravel']);
@@ -962,8 +962,8 @@ The slug is stable — renaming a tag preserves its slug (and existing URLs).
 ## Attaching tags to posts
 
 ```php
-use ManukMinasyan\FilamentBlog\Models\Post;
-use ManukMinasyan\FilamentBlog\Models\Tag;
+use Relaticle\Ink\Models\Post;
+use Relaticle\Ink\Models\Tag;
 
 $post = Post::find($id);
 $tag = Tag::firstOrCreate(['name' => 'Laravel']);
@@ -995,14 +995,14 @@ When both `features.public_routes` and `features.tags` are on, the route `/blog/
 Route::get('/tag/{slug}', [BlogController::class, 'tag'])->name('blog.tag');
 ```
 
-The shipped view at `resources/views/vendor/blog/pages/tag.blade.php` uses the `<x-blog::post-card>` component. Publish and edit it to customize.
+The shipped view at `resources/views/vendor/blog/pages/tag.blade.php` uses the `<x-ink::post-card>` component. Publish and edit it to customize.
 
 ## Disabling tags after enabling
 
 Flip the flag back to `false` and the admin UI + archive route disappear. Existing data stays in the tables — uninstall fully via:
 
 ```bash [Terminal]
-php artisan migrate:rollback --path=vendor/manukminasyan/filament-blog/database/migrations
+php artisan migrate:rollback --path=vendor/relaticle/ink/database/migrations
 ```
 
 ## Related-posts behavior
@@ -1051,7 +1051,7 @@ The package ships an **opt-in** integration with [`spatie/laravel-medialibrary`]
    php artisan migrate
    ```
 2. Flip the flag:
-   ```php [config/filament-blog.php]
+   ```php [config/ink.php]
    'features' => [
        'media_library' => true,
    ],
@@ -1067,7 +1067,7 @@ If you want the full integration today, override the `Post` model in your app:
 ```php [app/Models/BlogPost.php]
 namespace App\Models;
 
-use ManukMinasyan\FilamentBlog\Models\Post as BasePost;
+use Relaticle\Ink\Models\Post as BasePost;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
@@ -1085,7 +1085,7 @@ class BlogPost extends BasePost implements HasMedia
 
 Then point the package at your model:
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 // (post_model is not currently a config key — track this in
 // Phase 3 follow-up; for now the package always uses its own Post)
 ```
@@ -1093,7 +1093,7 @@ Then point the package at your model:
 ::alert{type="warning"}
 Swapping the post model isn't a config option in v1.4 — that lands in Phase 3 along with the model-side integration. Watch the 
 
-[GitHub releases](https://github.com/ManukMinasyan/filament-blog/releases){rel="nofollow"}
+[GitHub releases](https://github.com/relaticle/ink/releases){rel="nofollow"}
 
  for 
 
@@ -1125,8 +1125,8 @@ Contributions are welcome! Here's how to get started:
 ## Development Setup
 
 ```bash [Terminal]
-git clone git@github.com:ManukMinasyan/filament-blog.git
-cd filament-blog
+git clone git@github.com:relaticle/ink.git
+cd ink
 composer install
 ```
 

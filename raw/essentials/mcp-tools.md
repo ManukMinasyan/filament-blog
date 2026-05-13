@@ -347,7 +347,7 @@ The package includes 13 Model Context Protocol tools for full blog management vi
 Register the tools in your MCP server:
 
 ```php [app/Mcp/Servers/BlogServer.php]
-use ManukMinasyan\FilamentBlog\Mcp\Tools;
+use Relaticle\Ink\Mcp\Tools;
 
 class BlogServer extends Server
 {

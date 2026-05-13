@@ -2,7 +2,7 @@
 
 > All available Blade components for building your blog frontend.
 
-All components are publishable. Run `php artisan vendor:publish --tag=filament-blog-views` to customize.
+All components are publishable. Run `php artisan vendor:publish --tag=ink-views` to customize.
 
 ## SEO Components
 
@@ -12,7 +12,7 @@ Renders Open Graph, Twitter Card, and article meta tags in `<head>`.
 
 ```blade
 @push('head')
-    <x-blog::meta-tags :post="$post" />
+    <x-ink::meta-tags :post="$post" />
 @endpush
 ```
 
@@ -23,7 +23,7 @@ Renders Open Graph, Twitter Card, and article meta tags in `<head>`.
 Renders JSON-LD `BlogPosting` schema with publisher and breadcrumb data.
 
 ```blade
-<x-blog::structured-data :post="$post" />
+<x-ink::structured-data :post="$post" />
 ```
 
 **Renders:** `@type: BlogPosting` with headline, description, datePublished, dateModified, author, publisher (from config), articleSection, articleBody, and image.
@@ -34,7 +34,7 @@ Renders RSS `<link>` tag in `<head>`. Only renders if `blog.feed` route exists a
 
 ```blade
 @push('head')
-    <x-blog::feed-link />
+    <x-ink::feed-link />
 @endpush
 ```
 
@@ -44,7 +44,7 @@ Renders full RSS 2.0 XML. Use in your feed route view:
 
 ```blade
 {{-- resources/views/blog/feed.blade.php --}}
-<x-blog::feed :posts="$posts" />
+<x-ink::feed :posts="$posts" />
 ```
 
 ## UI Components
@@ -54,7 +54,7 @@ Renders full RSS 2.0 XML. Use in your feed route view:
 Displays a post in a listing. Shows category badge, date, title, excerpt, and featured image thumbnail.
 
 ```blade
-<x-blog::post-card :post="$post" />
+<x-ink::post-card :post="$post" />
 ```
 
 ### Post Header
@@ -62,7 +62,7 @@ Displays a post in a listing. Shows category badge, date, title, excerpt, and fe
 Renders category badge, title, author name, published date, and estimated read time.
 
 ```blade
-<x-blog::post-header :post="$post" />
+<x-ink::post-header :post="$post" />
 ```
 
 ### Post Body
@@ -70,7 +70,7 @@ Renders category badge, title, author name, published date, and estimated read t
 Renders featured image and markdown content in a Tailwind prose container with dark mode support.
 
 ```blade
-<x-blog::post-body :post="$post" />
+<x-ink::post-body :post="$post" />
 ```
 
 ### Related Posts
@@ -78,7 +78,7 @@ Renders featured image and markdown content in a Tailwind prose container with d
 Shows related posts section. Only renders if the collection is not empty.
 
 ```blade
-<x-blog::related-posts :posts="$relatedPosts" />
+<x-ink::related-posts :posts="$relatedPosts" />
 ```
 
 ### Category Badge
@@ -86,8 +86,8 @@ Shows related posts section. Only renders if the collection is not empty.
 Displays a category pill. Links to category page if `blog.category` route exists.
 
 ```blade
-<x-blog::category-badge :category="$post->category" />
-<x-blog::category-badge :category="$post->category" :linked="false" />
+<x-ink::category-badge :category="$post->category" />
+<x-ink::category-badge :category="$post->category" :linked="false" />
 ```
 
 ### Preview Banner
@@ -95,5 +95,5 @@ Displays a category pill. Links to category page if `blog.category` route exists
 Sticky amber banner for draft previews. Pushes `noindex` meta tag.
 
 ```blade
-<x-blog::preview-banner :post="$post" :editUrl="$editUrl" />
+<x-ink::preview-banner :post="$post" :editUrl="$editUrl" />
 ```

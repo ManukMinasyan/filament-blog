@@ -16,7 +16,7 @@
 ### Install Package
 
 ```bash [Terminal]
-composer require manukminasyan/filament-blog
+composer require relaticle/ink
 ```
 
 <alert type="info">
@@ -25,7 +25,7 @@ For private repositories, add the VCS repository to your `composer.json` first:
 
 ```json [composer.json]
 "repositories": [
-    {"type": "vcs", "url": "git@github.com:ManukMinasyan/filament-blog.git"}
+    {"type": "vcs", "url": "git@github.com:relaticle/ink.git"}
 ]
 ```
 
@@ -42,17 +42,17 @@ This creates `blog_posts`, `blog_categories`, `blog_tags`, and `blog_post_tag` t
 ### Register Filament Plugin
 
 ```php [AppPanelProvider.php]
-use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+use Relaticle\Ink\InkPlugin;
 
 $panel->plugins([
-    FilamentBlogPlugin::make(),
+    InkPlugin::make(),
 ]);
 ```
 
 ### Publish Config (optional)
 
 ```bash [Terminal]
-php artisan vendor:publish --tag=filament-blog-config
+php artisan vendor:publish --tag=ink-config
 ```
 
 </steps>
@@ -127,9 +127,9 @@ Most teams porting from the Tapix/FilaForms internal blog packages want public-r
 
 ## Default config
 
-After publishing, `config/filament-blog.php` looks like this. Everything is opt-in — defaults match the headless mode, so the package is a no-op until you flip a flag:
+After publishing, `config/ink.php` looks like this. Everything is opt-in — defaults match the headless mode, so the package is a no-op until you flip a flag:
 
-```php [config/filament-blog.php]
+```php [config/ink.php]
 return [
     'prefix' => 'blog',
     'layout' => 'layouts.app',
@@ -172,9 +172,9 @@ If your app enforces morph maps, register the blog models:
 ```php [AppServiceProvider.php]
 Relation::enforceMorphMap([
     // ...existing entries
-    'blog_post' => \ManukMinasyan\FilamentBlog\Models\Post::class,
-    'blog_category' => \ManukMinasyan\FilamentBlog\Models\Category::class,
-    'blog_tag' => \ManukMinasyan\FilamentBlog\Models\Tag::class,
+    'blog_post' => \Relaticle\Ink\Models\Post::class,
+    'blog_category' => \Relaticle\Ink\Models\Category::class,
+    'blog_tag' => \Relaticle\Ink\Models\Tag::class,
 ]);
 ```
 
@@ -193,7 +193,7 @@ The schema is identical (`blog_posts` and `blog_categories` table names match). 
 
 ```bash [Terminal]
 composer remove tapix/blog        # or filaforms/blog
-composer require manukminasyan/filament-blog
+composer require relaticle/ink
 ```
 
 Then enable public-routes mode in config:

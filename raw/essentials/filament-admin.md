@@ -375,10 +375,10 @@ See the [Tags Taxonomy](/essentials/tags) page for full schema and usage.
 ## Plugin Registration
 
 ```php [AppPanelProvider.php]
-use ManukMinasyan\FilamentBlog\FilamentBlogPlugin;
+use Relaticle\Ink\InkPlugin;
 
 $panel->plugins([
-    FilamentBlogPlugin::make(),
+    InkPlugin::make(),
 ]);
 ```
 
