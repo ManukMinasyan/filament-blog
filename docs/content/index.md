@@ -1,6 +1,6 @@
 ---
 seo:
-  title: Filament Blog — Headless blog package for Filament
+  title: Ink — Headless blog package for Filament
   description: Drop a blog into any Filament 5 app. Ships admin, SEO, MCP tools, and Blade components — bring your own routes or opt into the built-in ones with a config flag.
 ---
 

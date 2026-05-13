@@ -58,8 +58,8 @@ jobs:
         working-directory: ./docs
         run: npm run generate
         env:
-          NUXT_APP_BASE_URL: /filament-blog/
-          NUXT_SITE_URL: https://manukminasyan.github.io
+          NUXT_APP_BASE_URL: /ink/
+          NUXT_SITE_URL: https://relaticle.github.io
 
       - name: Deploy to gh-pages
         run: |

@@ -1,10 +1,10 @@
 export default defineAppConfig({
     docus: {
-        title: 'Filament Blog',
+        title: 'Ink',
         description: 'Headless blog package for Filament with SEO, MCP tools, and publishable components.',
     },
     seo: {
-        title: 'Filament Blog',
+        title: 'Ink',
         description: 'Headless blog package for Filament with SEO, MCP tools, and publishable components.',
     },
     github: {
