@@ -1,6 +1,6 @@
 # Contributing
 
-> How to contribute to Filament Blog.
+> How to contribute to Ink.
 
 Contributions are welcome! Here's how to get started:
 

@@ -1,4 +1,4 @@
-# Filament Blog — Headless blog package for Filament
+# Ink — Headless blog package for Filament
 
 ::u-page-hero
 #title
@@ -12,7 +12,7 @@ Ships the admin, SEO components, MCP tools, and Blade components. Bring your own
   ---
   color: neutral
   size: xl
-  to: https://relaticle.github.io/filament-blog/getting-started/installation
+  to: https://relaticle.github.io/ink/getting-started/installation
   trailing-icon: i-lucide-arrow-right
   ---
   Get started
@@ -162,10 +162,10 @@ php artisan vendor:publish --tag=ink-config
 
 The package ships **two install modes**:
 
-| Mode                            | When to use                                                                  | Doc                                                                                                   |
-| ------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| **Headless (default)**          | You want the Blade components and admin, but full control over routing/views | [Frontend Setup (headless)](https://relaticle.github.io/filament-blog/getting-started/frontend-setup) |
-| **Public-routes mode (opt-in)** | You want a working blog at `/blog` without writing a single controller       | [Public-routes mode](https://relaticle.github.io/filament-blog/getting-started/public-routes-mode)    |
+| Mode                            | When to use                                                                  | Doc                                                                                         |
+| ------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Headless (default)**          | You want the Blade components and admin, but full control over routing/views | [Frontend Setup (headless)](https://relaticle.github.io/ink/getting-started/frontend-setup) |
+| **Public-routes mode (opt-in)** | You want a working blog at `/blog` without writing a single controller       | [Public-routes mode](https://relaticle.github.io/ink/getting-started/public-routes-mode)    |
 
 Most teams porting from the Tapix/FilaForms internal blog packages want public-routes mode — it ships the same flow they had, just behind a flag.
 
@@ -207,7 +207,7 @@ return [
 ];
 ```
 
-See [Configuration](https://relaticle.github.io/filament-blog/essentials/configuration) for the full reference.
+See [Configuration](https://relaticle.github.io/ink/essentials/configuration) for the full reference.
 
 ## Morph Map
 
@@ -259,7 +259,7 @@ No data migration needed.
 
  See 
 
-[Public-routes mode](https://relaticle.github.io/filament-blog/getting-started/public-routes-mode)
+[Public-routes mode](https://relaticle.github.io/ink/getting-started/public-routes-mode)
 
  — flip a config flag and you're done. This page covers the 
 
@@ -426,7 +426,7 @@ The package checks for these names when generating URLs. If a route is missing, 
 
 ## Promote to public-routes mode any time
 
-If writing all this gets old, flip the flag in config and delete your controller — the package will register equivalent routes automatically. See [Public-routes mode](https://relaticle.github.io/filament-blog/getting-started/public-routes-mode).
+If writing all this gets old, flip the flag in config and delete your controller — the package will register equivalent routes automatically. See [Public-routes mode](https://relaticle.github.io/ink/getting-started/public-routes-mode).
 
 
 # Public-routes mode
@@ -522,7 +522,7 @@ When a flag is off, requests to that path return **404** (not registered). `Rout
 | Custom domain logic   | Yes (any)       | Limited to view overrides |
 | Effort to ship a blog | \~2 hours       | \~5 minutes               |
 
-If you outgrow public-routes mode, flip the flag back to `false` and write your own controllers — see [Frontend Setup (headless)](https://relaticle.github.io/filament-blog/getting-started/frontend-setup).
+If you outgrow public-routes mode, flip the flag back to `false` and write your own controllers — see [Frontend Setup (headless)](https://relaticle.github.io/ink/getting-started/frontend-setup).
 
 
 # Blade Components
@@ -683,7 +683,7 @@ Appears in the Blog navigation group when `features.tags` is enabled. Mirrors th
 
 When the flag is off, the resource class still exists but `shouldRegisterNavigation()` returns `false` so it doesn't appear in the sidebar.
 
-See the [Tags Taxonomy](https://relaticle.github.io/filament-blog/essentials/tags) page for full schema and usage.
+See the [Tags Taxonomy](https://relaticle.github.io/ink/essentials/tags) page for full schema and usage.
 
 ## Plugin Registration
 
@@ -1137,4 +1137,4 @@ Follow PSR-12 and Laravel conventions. All files must have `declare(strict_types
 
 # License
 
-Filament Blog is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT){rel="nofollow"}.
+Ink is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT){rel="nofollow"}.

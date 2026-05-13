@@ -1,6 +1,6 @@
 # Configuration
 
-> Full configuration reference for Filament Blog.
+> Full configuration reference for Ink.
 
 Publish the config file:
 

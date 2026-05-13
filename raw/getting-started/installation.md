@@ -1,6 +1,6 @@
 # Installation
 
-> Install Filament Blog in your Laravel application.
+> Install Ink in your Laravel application.
 
 ## Requirements
 
