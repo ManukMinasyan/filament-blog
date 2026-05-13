@@ -32,6 +32,15 @@ return [
         'logo' => null,
     ],
 
+    'schema' => [
+        'faq_auto' => true,
+        'howto_auto' => false,
+    ],
+
+    'search' => [
+        'callback' => null,
+    ],
+
     'tables' => [
         'posts' => 'blog_posts',
         'categories' => 'blog_categories',

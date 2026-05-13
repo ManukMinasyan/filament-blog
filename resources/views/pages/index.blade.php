@@ -13,7 +13,7 @@
     </div>
 
     <div class="mt-12">
-        {{ $posts->links() }}
+        {{ $posts->links('ink::pagination.blog') }}
     </div>
 </div>
 @endsection

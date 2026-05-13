@@ -1,4 +1,4 @@
-<a href="{{ $post->getUrl() }}" class="group block py-6 -mx-4 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors duration-200">
+<a href="{{ $post->getUrl() }}" wire:navigate class="group block py-6 -mx-4 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors duration-200">
     <div class="flex items-start justify-between gap-6">
         <div class="min-w-0 flex-1">
             <div class="flex items-center gap-3 mb-2">

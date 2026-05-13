@@ -12,6 +12,6 @@
         @endforelse
     </div>
 
-    <div class="mt-12">{{ $posts->links() }}</div>
+    <div class="mt-12">{{ $posts->links('ink::pagination.blog') }}</div>
 </div>
 @endsection

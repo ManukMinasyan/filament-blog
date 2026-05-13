@@ -11,6 +11,7 @@ use Illuminate\Routing\Controller;
 use Relaticle\Ink\Models\Category;
 use Relaticle\Ink\Models\Post;
 use Relaticle\Ink\Models\Tag;
+use Relaticle\Ink\Support\BlogListingSeo;
 
 class BlogController extends Controller
 {
@@ -18,11 +19,25 @@ class BlogController extends Controller
     {
         $perPage = (int) config('ink.per_page', 12);
 
-        $posts = Post::query()
+        $searchQuery = trim((string) $request->query('q', ''));
+
+        $query = Post::query()
             ->with(['category', 'author', 'seo'])
-            ->published()
+            ->published();
+
+        if ($searchQuery !== '') {
+            $query->search($searchQuery);
+        }
+
+        $posts = $query
             ->latest('published_at')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
+
+        seo()->for(BlogListingSeo::forIndex(
+            page: (int) $request->query('page', 1),
+            searchQuery: $request->query('q'),
+        ));
 
         return view('ink::pages.index', [
             'posts' => $posts,
@@ -38,6 +53,8 @@ class BlogController extends Controller
             ->firstOrFail();
 
         $relatedPosts = $post->relatedPosts(limit: 3)->get();
+
+        seo()->for($post);
 
         return view('ink::pages.show', [
             'post' => $post,
@@ -57,6 +74,11 @@ class BlogController extends Controller
             ->latest('published_at')
             ->paginate($perPage);
 
+        seo()->for(BlogListingSeo::forCategory(
+            category: $category,
+            page: (int) request()->query('page', 1),
+        ));
+
         return view('ink::pages.category', [
             'category' => $category,
             'posts' => $posts,
@@ -65,8 +87,12 @@ class BlogController extends Controller
 
     public function preview(Post $post): View
     {
+        $post->loadMissing(['category', 'author', 'seo']);
+
+        seo()->for($post);
+
         return view('ink::pages.preview', [
-            'post' => $post->loadMissing(['category', 'author', 'seo']),
+            'post' => $post,
         ]);
     }
 
@@ -83,6 +109,11 @@ class BlogController extends Controller
             ->published()
             ->latest('published_at')
             ->paginate($perPage);
+
+        seo()->for(BlogListingSeo::forTag(
+            tag: $tag,
+            page: (int) request()->query('page', 1),
+        ));
 
         return view('ink::pages.tag', [
             'tag' => $tag,

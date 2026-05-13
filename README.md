@@ -5,7 +5,9 @@ Filament-native content publishing for blog, docs, and AI-citable articles. Ship
 ## Features
 
 - **Filament Admin** — PostResource and CategoryResource with markdown editor, draft/published/scheduled UX, SEO fields, featured images, and bulk publish/unpublish/schedule actions
-- **SEO Components** — Meta tags, Open Graph, Twitter Cards, JSON-LD structured data, RSS feed, canonical URLs
+- **SEO Components** — Meta tags, Open Graph, Twitter Cards, RSS feed, per-page canonicals on paginated listings
+- **JSON-LD Schema** — `BlogPosting` + `BreadcrumbList` on post pages, `FAQPage` and `HowTo` auto-detected from content (opt-in), `Blog` + `CollectionPage` on listings
+- **Search** — Portable `Post::search()` scope (LIKE by default, override for FTS / Scout), drop-in `BlogSearch` Livewire component with `?q=` URL sync
 - **13 MCP Tools** — Full CRUD for posts and categories via Model Context Protocol, with markdown sanitization (HTML stripped, unsafe links blocked)
 - **Publishable UI Components** — Post card, header, body, related posts, category badge, preview banner — all with dark mode
 - **Two install modes**

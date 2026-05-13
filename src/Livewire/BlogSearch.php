@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Relaticle\Ink\Livewire;
+
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
+use Livewire\Attributes\Url;
+use Livewire\Component;
+use Relaticle\Ink\Models\Post;
+
+class BlogSearch extends Component
+{
+    #[Url(as: 'q', except: '')]
+    public string $query = '';
+
+    public function render(): View
+    {
+        $results = $this->query === ''
+            ? new Collection
+            : Post::query()
+                ->with(['category', 'author'])
+                ->published()
+                ->search($this->query)
+                ->latest('published_at')
+                ->limit(20)
+                ->get();
+
+        return view('ink::livewire.blog-search', [
+            'results' => $results,
+        ]);
+    }
+}

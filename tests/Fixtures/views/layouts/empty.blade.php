@@ -1,4 +1,4 @@
 <!doctype html>
-<html><head><title>{{ $title ?? 'Blog' }}</title></head>
+<html><head><title>{{ $title ?? 'Blog' }}</title>{!! seo() !!}</head>
 <body>@yield('content')</body>
 </html>
