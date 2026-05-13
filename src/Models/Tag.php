@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Models;
+namespace Relaticle\Ink\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use ManukMinasyan\FilamentBlog\Database\Factories\TagFactory;
+use Relaticle\Ink\Database\Factories\TagFactory;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 

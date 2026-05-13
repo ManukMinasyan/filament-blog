@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources\TagResource\Pages;
+namespace Relaticle\Ink\Filament\Resources\TagResource\Pages;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
-use ManukMinasyan\FilamentBlog\Filament\Resources\TagResource;
+use Relaticle\Ink\Filament\Resources\TagResource;
 
 class EditTag extends EditRecord
 {

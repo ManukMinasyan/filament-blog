@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
 
 test('readingTime computes minutes from content word count', function () {
     $post = Post::factory()->create([

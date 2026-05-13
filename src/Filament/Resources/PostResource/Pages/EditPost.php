@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources\PostResource\Pages;
+namespace Relaticle\Ink\Filament\Resources\PostResource\Pages;
 
 use Filament\Resources\Pages\EditRecord;
-use ManukMinasyan\FilamentBlog\Filament\Resources\PostResource;
+use Relaticle\Ink\Filament\Resources\PostResource;
 
 class EditPost extends EditRecord
 {

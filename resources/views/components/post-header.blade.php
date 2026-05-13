@@ -1,7 +1,7 @@
 <header class="mb-10">
     <div class="flex items-center gap-3 mb-4">
         @if($post->category)
-            <x-blog::category-badge :category="$post->category" />
+            <x-ink::category-badge :category="$post->category" />
         @endif
     </div>
 

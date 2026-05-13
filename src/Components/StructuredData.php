@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Components;
+namespace Relaticle\Ink\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Post;
 
 class StructuredData extends Component
 {
@@ -22,13 +22,13 @@ class StructuredData extends Component
 
     public function render(): View
     {
-        return view('blog::components.structured-data');
+        return view('ink::components.structured-data');
     }
 
     /** @return array<string, mixed> */
     private function buildSchema(): array
     {
-        $publisherConfig = config('filament-blog.publisher');
+        $publisherConfig = config('ink.publisher');
 
         $schema = [
             '@context' => 'https://schema.org',

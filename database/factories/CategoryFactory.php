@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Database\Factories;
+namespace Relaticle\Ink\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use ManukMinasyan\FilamentBlog\Models\Category;
+use Relaticle\Ink\Models\Category;
 
 /** @extends Factory<Category> */
 class CategoryFactory extends Factory

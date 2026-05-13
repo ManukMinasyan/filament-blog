@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog;
+namespace Relaticle\Ink;
 
 use Illuminate\Support\Facades\Blade;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
-class FilamentBlogServiceProvider extends PackageServiceProvider
+class InkServiceProvider extends PackageServiceProvider
 {
-    public static string $name = 'filament-blog';
+    public static string $name = 'ink';
 
-    public static string $viewNamespace = 'blog';
+    public static string $viewNamespace = 'ink';
 
     public function configurePackage(Package $package): void
     {
@@ -25,9 +25,9 @@ class FilamentBlogServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        Blade::componentNamespace('ManukMinasyan\\FilamentBlog\\Components', 'blog');
+        Blade::componentNamespace('Relaticle\\Ink\\Components', 'ink');
 
-        if (config('filament-blog.features.public_routes')) {
+        if (config('ink.features.public_routes')) {
             $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         }
     }

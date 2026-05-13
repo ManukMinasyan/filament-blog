@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Components;
+namespace Relaticle\Ink\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Post;
 
 class PostCard extends Component
 {
@@ -16,6 +16,6 @@ class PostCard extends Component
 
     public function render(): View
     {
-        return view('blog::components.post-card');
+        return view('ink::components.post-card');
     }
 }

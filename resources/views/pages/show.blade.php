@@ -1,4 +1,4 @@
-@extends(config('filament-blog.layout', 'layouts.app'))
+@extends(config('ink.layout', 'layouts.app'))
 
 @section('content')
 <article class="max-w-2xl mx-auto px-4 py-12 prose dark:prose-invert">

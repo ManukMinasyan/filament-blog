@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources;
+namespace Relaticle\Ink\Filament\Resources;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -19,10 +19,10 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\CreateCategory;
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\EditCategory;
-use ManukMinasyan\FilamentBlog\Filament\Resources\CategoryResource\Pages\ListCategories;
-use ManukMinasyan\FilamentBlog\Models\Category;
+use Relaticle\Ink\Filament\Resources\CategoryResource\Pages\CreateCategory;
+use Relaticle\Ink\Filament\Resources\CategoryResource\Pages\EditCategory;
+use Relaticle\Ink\Filament\Resources\CategoryResource\Pages\ListCategories;
+use Relaticle\Ink\Models\Category;
 
 class CategoryResource extends Resource
 {

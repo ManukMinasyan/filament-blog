@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     },
     appConfig: {
         docus: {
-            url: `https://manukminasyan.github.io${baseURL}`,
+            url: `https://relaticle.github.io${baseURL}`,
             header: {
                 logo: false,
             },
@@ -41,7 +41,7 @@ export default defineNuxtConfig({
         },
     },
     llms: {
-        domain: `https://manukminasyan.github.io${baseURL.replace(/\/$/, '')}`,
+        domain: `https://relaticle.github.io${baseURL.replace(/\/$/, '')}`,
     },
     nitro: {
         preset: 'github_pages',

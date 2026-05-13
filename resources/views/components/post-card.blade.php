@@ -3,7 +3,7 @@
         <div class="min-w-0 flex-1">
             <div class="flex items-center gap-3 mb-2">
                 @if($post->category)
-                    <x-blog::category-badge :category="$post->category" :linked="false" />
+                    <x-ink::category-badge :category="$post->category" :linked="false" />
                 @endif
                 @if($post->published_at)
                     <time datetime="{{ $post->published_at->toIso8601String() }}" class="text-xs text-gray-400 dark:text-gray-500">

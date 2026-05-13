@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources;
+namespace Relaticle\Ink\Filament\Resources;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -19,10 +19,10 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use ManukMinasyan\FilamentBlog\Filament\Resources\TagResource\Pages\CreateTag;
-use ManukMinasyan\FilamentBlog\Filament\Resources\TagResource\Pages\EditTag;
-use ManukMinasyan\FilamentBlog\Filament\Resources\TagResource\Pages\ListTags;
-use ManukMinasyan\FilamentBlog\Models\Tag;
+use Relaticle\Ink\Filament\Resources\TagResource\Pages\CreateTag;
+use Relaticle\Ink\Filament\Resources\TagResource\Pages\EditTag;
+use Relaticle\Ink\Filament\Resources\TagResource\Pages\ListTags;
+use Relaticle\Ink\Models\Tag;
 
 class TagResource extends Resource
 {
@@ -36,7 +36,7 @@ class TagResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        return (bool) config('filament-blog.features.tags', false);
+        return (bool) config('ink.features.tags', false);
     }
 
     public static function getNavigationBadge(): ?string

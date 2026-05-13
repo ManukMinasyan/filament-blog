@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Http\Controllers;
+namespace Relaticle\Ink\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use ManukMinasyan\FilamentBlog\Models\Category;
-use ManukMinasyan\FilamentBlog\Models\Post;
-use ManukMinasyan\FilamentBlog\Models\Tag;
+use Relaticle\Ink\Models\Category;
+use Relaticle\Ink\Models\Post;
+use Relaticle\Ink\Models\Tag;
 
 class BlogController extends Controller
 {
     public function index(Request $request): View
     {
-        $perPage = (int) config('filament-blog.per_page', 12);
+        $perPage = (int) config('ink.per_page', 12);
 
         $posts = Post::query()
             ->with(['category', 'author', 'seo'])
@@ -24,7 +24,7 @@ class BlogController extends Controller
             ->latest('published_at')
             ->paginate($perPage);
 
-        return view('blog::pages.index', [
+        return view('ink::pages.index', [
             'posts' => $posts,
         ]);
     }
@@ -39,7 +39,7 @@ class BlogController extends Controller
 
         $relatedPosts = $post->relatedPosts(limit: 3)->get();
 
-        return view('blog::pages.show', [
+        return view('ink::pages.show', [
             'post' => $post,
             'relatedPosts' => $relatedPosts,
         ]);
@@ -48,7 +48,7 @@ class BlogController extends Controller
     public function category(string $slug): View
     {
         $category = Category::where('slug', $slug)->firstOrFail();
-        $perPage = (int) config('filament-blog.per_page', 12);
+        $perPage = (int) config('ink.per_page', 12);
 
         $posts = Post::query()
             ->with(['category', 'author', 'seo'])
@@ -57,7 +57,7 @@ class BlogController extends Controller
             ->latest('published_at')
             ->paginate($perPage);
 
-        return view('blog::pages.category', [
+        return view('ink::pages.category', [
             'category' => $category,
             'posts' => $posts,
         ]);
@@ -65,17 +65,17 @@ class BlogController extends Controller
 
     public function preview(Post $post): View
     {
-        return view('blog::pages.preview', [
+        return view('ink::pages.preview', [
             'post' => $post->loadMissing(['category', 'author', 'seo']),
         ]);
     }
 
     public function tag(string $slug): View
     {
-        abort_unless(config('filament-blog.features.tags', false), 404);
+        abort_unless(config('ink.features.tags', false), 404);
 
         $tag = Tag::where('slug', $slug)->firstOrFail();
-        $perPage = (int) config('filament-blog.per_page', 12);
+        $perPage = (int) config('ink.per_page', 12);
 
         $posts = Post::query()
             ->with(['category', 'author', 'seo'])
@@ -84,7 +84,7 @@ class BlogController extends Controller
             ->latest('published_at')
             ->paginate($perPage);
 
-        return view('blog::pages.tag', [
+        return view('ink::pages.tag', [
             'tag' => $tag,
             'posts' => $posts,
         ]);
@@ -92,7 +92,7 @@ class BlogController extends Controller
 
     public function feed(): Response
     {
-        abort_unless(config('filament-blog.features.feed', false), 404);
+        abort_unless(config('ink.features.feed', false), 404);
 
         $posts = Post::query()
             ->with(['author', 'seo'])
@@ -102,7 +102,7 @@ class BlogController extends Controller
             ->get();
 
         return response()
-            ->view('blog::pages.feed', ['posts' => $posts])
+            ->view('ink::pages.feed', ['posts' => $posts])
             ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
     }
 }

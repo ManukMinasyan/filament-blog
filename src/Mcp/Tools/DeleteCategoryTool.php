@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Mcp\Tools;
+namespace Relaticle\Ink\Mcp\Tools;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
@@ -11,7 +11,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
-use ManukMinasyan\FilamentBlog\Models\Category;
+use Relaticle\Ink\Models\Category;
 
 #[Description('Soft delete a blog category by ID. The category can be restored later.')]
 class DeleteCategoryTool extends Tool

@@ -1,6 +1,6 @@
-# Filament Blog
+# Ink
 
-Headless blog package for Filament applications. Provides models, Filament admin, MCP tools, SEO components, publishable UI components, and an **opt-in public-routes mode** for hosts that just want a working blog without writing controllers.
+Filament-native content publishing for blog, docs, and AI-citable articles. Ships Eloquent models, a full Filament admin, MCP tools for AI agents, SEO components, publishable Blade UI components, and an **opt-in public-routes mode** for hosts that want a working blog without writing controllers.
 
 ## Features
 
@@ -25,14 +25,14 @@ Headless blog package for Filament applications. Provides models, Filament admin
 ## Installation
 
 ```bash
-composer require manukminasyan/filament-blog
+composer require relaticle/ink
 ```
 
 Register the plugin and run migrations:
 
 ```php
 // AppPanelProvider.php
-->plugin(\ManukMinasyan\FilamentBlog\FilamentBlogPlugin::make())
+->plugin(\Relaticle\Ink\InkPlugin::make())
 ```
 
 ```bash
@@ -46,7 +46,7 @@ By default this package is fully headless: no routes, no controllers, no forced 
 To get a working blog at `/blog` without writing any controllers, flip the feature flag:
 
 ```php
-// config/filament-blog.php
+// config/ink.php
 'features' => [
     'public_routes' => true,   // /blog, /blog/{slug}, /blog/category/{slug}, /blog/preview/{post}
     'feed'          => true,   // adds /blog/feed (RSS 2.0)
@@ -62,19 +62,19 @@ Routes register at the service-provider level — no Filament panel boot is requ
 Publish the views if you want to customize them:
 
 ```bash
-php artisan vendor:publish --tag=filament-blog-views
+php artisan vendor:publish --tag=ink-views
 ```
 
 ## Documentation
 
-**[Read the full documentation →](https://manukminasyan.github.io/filament-blog/)**
+**[Read the full documentation →](https://relaticle.github.io/ink/)**
 
-- [Installation](https://manukminasyan.github.io/filament-blog/getting-started/installation)
-- [Frontend Setup](https://manukminasyan.github.io/filament-blog/getting-started/frontend-setup)
-- [Blade Components](https://manukminasyan.github.io/filament-blog/essentials/blade-components)
-- [Filament Admin](https://manukminasyan.github.io/filament-blog/essentials/filament-admin)
-- [MCP Tools](https://manukminasyan.github.io/filament-blog/essentials/mcp-tools)
-- [Configuration](https://manukminasyan.github.io/filament-blog/essentials/configuration)
+- [Installation](https://relaticle.github.io/ink/getting-started/installation)
+- [Frontend Setup](https://relaticle.github.io/ink/getting-started/frontend-setup)
+- [Blade Components](https://relaticle.github.io/ink/essentials/blade-components)
+- [Filament Admin](https://relaticle.github.io/ink/essentials/filament-admin)
+- [MCP Tools](https://relaticle.github.io/ink/essentials/mcp-tools)
+- [Configuration](https://relaticle.github.io/ink/essentials/configuration)
 
 ## Quick Example (headless)
 
@@ -82,14 +82,14 @@ php artisan vendor:publish --tag=filament-blog-views
 {{-- In your blog show page --}}
 <x-your-layout>
     @push('head')
-        <x-blog::meta-tags :post="$post" />
-        <x-blog::feed-link />
+        <x-ink::meta-tags :post="$post" />
+        <x-ink::feed-link />
     @endpush
 
-    <x-blog::structured-data :post="$post" />
-    <x-blog::post-header :post="$post" />
-    <x-blog::post-body :post="$post" />
-    <x-blog::related-posts :post="$post" />
+    <x-ink::structured-data :post="$post" />
+    <x-ink::post-header :post="$post" />
+    <x-ink::post-body :post="$post" />
+    <x-ink::related-posts :post="$post" />
 </x-your-layout>
 ```
 

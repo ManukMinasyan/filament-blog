@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Models;
+namespace Relaticle\Ink\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,13 +16,13 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
-use ManukMinasyan\FilamentBlog\Database\Factories\PostFactory;
-use ManukMinasyan\FilamentBlog\Enums\PostStatus;
 use RalphJSmit\Laravel\SEO\Schema\ArticleSchema;
 use RalphJSmit\Laravel\SEO\Schema\BreadcrumbListSchema;
 use RalphJSmit\Laravel\SEO\SchemaCollection;
 use RalphJSmit\Laravel\SEO\Support\HasSEO;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
+use Relaticle\Ink\Database\Factories\PostFactory;
+use Relaticle\Ink\Enums\PostStatus;
 use Spatie\LaravelMarkdown\MarkdownRenderer;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -92,7 +92,7 @@ class Post extends Model
     /** @return BelongsTo<Model, $this> */
     public function author(): BelongsTo
     {
-        return $this->belongsTo(config('filament-blog.author_model'), 'author_id');
+        return $this->belongsTo(config('ink.author_model'), 'author_id');
     }
 
     /** @return array{label: string, color: string} */
@@ -212,7 +212,7 @@ class Post extends Model
                 $article->type = 'BlogPosting';
 
                 return $article->markup(function (Collection $markup): Collection {
-                    $publisherConfig = config('filament-blog.publisher');
+                    $publisherConfig = config('ink.publisher');
 
                     if (! $publisherConfig['name']) {
                         return $markup;

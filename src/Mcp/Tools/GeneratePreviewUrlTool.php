@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Mcp\Tools;
+namespace Relaticle\Ink\Mcp\Tools;
 
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Illuminate\JsonSchema\Types\Type;
@@ -12,7 +12,7 @@ use Laravel\Mcp\Response;
 use Laravel\Mcp\Server\Attributes\Description;
 use Laravel\Mcp\Server\Tool;
 use Laravel\Mcp\Server\Tools\Annotations\IsReadOnly;
-use ManukMinasyan\FilamentBlog\Models\Post;
+use Relaticle\Ink\Models\Post;
 
 #[Description('Generate a temporary signed preview URL for a blog post. The URL expires in 1 hour and can be opened in a browser to visually verify the post rendering.')]
 #[IsReadOnly]

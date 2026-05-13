@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Components;
+namespace Relaticle\Ink\Components;
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Route;
@@ -19,11 +19,11 @@ class FeedLink extends Component
 
     public function render(): View
     {
-        return view('blog::components.feed-link');
+        return view('ink::components.feed-link');
     }
 
     public function shouldRender(): bool
     {
-        return $this->hasFeedRoute && config('filament-blog.feed.enabled', true);
+        return $this->hasFeedRoute && config('ink.feed.enabled', true);
     }
 }

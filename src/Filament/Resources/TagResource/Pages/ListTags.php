@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ManukMinasyan\FilamentBlog\Filament\Resources\TagResource\Pages;
+namespace Relaticle\Ink\Filament\Resources\TagResource\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use ManukMinasyan\FilamentBlog\Filament\Resources\TagResource;
+use Relaticle\Ink\Filament\Resources\TagResource;
 
 class ListTags extends ListRecords
 {
