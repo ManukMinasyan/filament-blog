@@ -1,5 +1,11 @@
 # Ink
 
+  <a href="https://packagist.org/packages/relaticle/ink"><img src="https://img.shields.io/packagist/dt/relaticle/ink.svg?style=for-the-badge" alt="Downloads"></a>
+  <a href="https://laravel.com/docs/12.x"><img src="https://img.shields.io/badge/Laravel-12.x%20%7C%2013.x-FF2D20?style=for-the-badge&logo=laravel" alt="Laravel 12 and 13"></a>
+  <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-8.4-777BB4?style=for-the-badge&logo=php" alt="PHP 8.4"></a>
+  <a href="https://packagist.org/packages/relaticle/ink"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"></a>
+  <a href="https://github.com/relaticle/ink/actions/workflows/tests.yml"><img src="https://img.shields.io/github/actions/workflow/status/relaticle/ink/tests.yml?branch=main&style=for-the-badge&label=tests" alt="Tests"></a>
+
 Filament-native content publishing for blog, docs, and AI-citable articles. Ships Eloquent models, a full Filament admin, MCP tools for AI agents, SEO components, publishable Blade UI components, and an **opt-in public-routes mode** for hosts that want a working blog without writing controllers.
 
 ## Features
